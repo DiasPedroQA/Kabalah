@@ -6,18 +6,6 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from src.controllers import path_check_controller
 
-# Nome original 'app' do aplicativo FastAPI
-application = FastAPI(
-    title="Meu Projeto API",
-    description="API de verificação de caminhos de arquivos",
-    version="1.0.0"
-)
-
-# Inclua rotas
-application.include_router(path_check_controller.router)
-
-# Restante do seu código
-
 # Configuração de Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,6 +18,7 @@ async def lifespan():
     yield
     logger.info("A aplicação FastAPI está sendo encerrada.")
 
+# Nome original 'app' do aplicativo FastAPI
 app = FastAPI(
     title="Meu Projeto API",
     description="Esta API permite realizar verificações de caminhos de arquivos e outros exemplos.",  # noqa: E501
@@ -39,7 +28,7 @@ app = FastAPI(
 
 # Configuração de CORS
 origins = [
-    "http://localhost:3000",  # Permitir acesso de um front-end local
+    "http://localhost:3000",   # Permitir acesso de um front-end local
     "https://meu-site.com",    # Adicione aqui o domínio do seu front-end
 ]
 
