@@ -1,0 +1,100 @@
+# Arquivo de configuração do projeto em formato TOML
+# O pyproject.toml é usado para configurar ferramentas de análise de código, dependências,
+# e definições para ferramentas de desenvolvimento como o Black, Flake8, isort e pytest.
+
+[tool.black]
+# Configurações do formatador Black.
+# Define o comprimento máximo das linhas para 95 caracteres.
+line-length = 95
+
+# Evitar a normalização automática de strings (aspas duplas para aspas simples).
+skip-string-normalization = true
+
+# Excluir diretórios e arquivos do processo de formatação do Black.
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \venv
+  | \.mypy_cache
+  | \.tox
+  | \.pytest_cache
+  | \.vscode
+  | migrations
+  | build
+  | dist
+)/
+'''
+
+[tool.flake8]
+# Configurações para o Flake8, usadas para garantir conformidade com PEP8.
+# Mantém o comprimento de linha consistente com o Black.
+max-line-length = 95
+
+# Ignorar códigos de erro que já foram ajustados no arquivo `.flake8`.
+ignore = ["E0401", "C901", "E501", "W503"]
+
+# Diretórios e arquivos que não precisam ser verificados.
+exclude = ".git,__pycache__,docs/source/conf.py,old,build,dist,migrations"
+
+[tool.pylint]
+# Configurações para o Pylint, usado para análise estática do código.
+# Define o comprimento máximo da linha para 95 caracteres.
+max-line-length = 95
+
+[tool.isort]
+# Configurações para o isort, que organiza os imports de forma consistente.
+# Usa o perfil do Black para manter consistência.
+profile = "black"
+line_length = 95
+
+# Definição de pacotes de terceiros e pacotes locais.
+known_third_party = ["flask", "sqlalchemy", "pytest"]
+known_first_party = ["src"]
+
+# Excluir diretórios dos quais o isort não deve organizar imports.
+skip = ["migrations", "build", "dist"]
+
+[tool.mypy]
+# Configurações para o mypy, que realiza verificação de tipos em tempo de execução.
+# Ignorar pastas de migrations, cache, etc.
+exclude = '/migrations/|/venv/|/tests/'
+
+# Ativar verificação de tipos mais rigorosa.
+strict = true
+
+# Exigir que todas as funções tenham tipos definidos.
+disallow_untyped_defs = true
+
+# Exigir que todas as chamadas de função usem argumentos tipados.
+disallow_untyped_calls = true
+
+# Ignorar erros de importação para bibliotecas externas que podem não ter tipagem completa.
+ignore_missing_imports = true
+
+# Certificar que todos os argumentos das funções sejam devidamente tipados.
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+# Configurações para o pytest, utilizado para testes automatizados.
+# Versão mínima do pytest para rodar.
+minversion = "6.0"
+
+# Opções para o pytest: testes serão executados com cobertura de código.
+addopts = "--strict-markers --tb=short --cov=src --cov-fail-under=75"
+
+# Diretórios onde os testes estão localizados.
+testpaths = [
+    "tests"
+]
+
+# Definir o formato dos arquivos de teste.
+python_files = ["test_*.py"]
+
+[tool.pytest-cov]
+# Definir os relatórios de cobertura para o pytest-cov.
+# "term-missing" mostra o código faltante no terminal, e "htmlcov" gera relatório HTML.
+cov-report = "term-missing,html:htmlcov"
+
+# Define a cobertura mínima exigida para que os testes sejam considerados completos.
+fail-under = 75

@@ -21,14 +21,14 @@ async def lifespan():
 # Nome original 'app' do aplicativo FastAPI
 app = FastAPI(
     title="Meu Projeto API",
-    description="Esta API permite realizar verificações de caminhos de arquivos e outros exemplos.",  # noqa: E501
+    description="Esta API verifica caminhos de arquivos e pastas.",
     version="1.0.0",
     lifespan=lifespan
 )
 
 # Configuração de CORS
 origins = [
-    "http://localhost:3000",   # Permitir acesso de um front-end local
+    "http://localhost:8000",   # Permitir acesso de um front-end local
     "https://meu-site.com",    # Adicione aqui o domínio do seu front-end
 ]
 

@@ -25,6 +25,7 @@ async def verificar_caminho(requisicao: RequisicaoVerificacaoCaminho):
     ).joinpath(
         requisicao.caminho
     ).resolve()
+    print(f"Verificando caminho: {caminho_absoluto}")
 
     # Verifica se o caminho existe
     if not caminho_absoluto.exists():

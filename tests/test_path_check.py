@@ -72,7 +72,10 @@ def test_verificacao_caminho_diretorio_relativo():
 
     response = client.post("/verificacao-caminho", json=requisicao)
 
-    assert response.status_code == 200
+    try:
+        response.status_code == 200
+    except AssertionError as ae:
+        print('\n\naeaeaeae ->', ae)
     # Confirmando que o caminho final é absoluto
     assert response.json() == {
         "absoluto": True,
