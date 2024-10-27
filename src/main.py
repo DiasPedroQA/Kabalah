@@ -1,18 +1,40 @@
 # pylint: disable=C
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 import logging
-from src.controllers import exemplo_controller, path_check_controller
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+from src.controllers import path_check_controller
+
+# Nome original 'app' do aplicativo FastAPI
+application = FastAPI(
+    title="Meu Projeto API",
+    description="API de verificação de caminhos de arquivos",
+    version="1.0.0"
+)
+
+# Inclua rotas
+application.include_router(path_check_controller.router)
+
+# Restante do seu código
 
 # Configuração de Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+# Define o lifespan event handler
+@asynccontextmanager
+async def lifespan():
+    logger.info("A aplicação FastAPI foi iniciada.")
+    yield
+    logger.info("A aplicação FastAPI está sendo encerrada.")
+
 app = FastAPI(
     title="Meu Projeto API",
     description="Esta API permite realizar verificações de caminhos de arquivos e outros exemplos.",  # noqa: E501
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Configuração de CORS
@@ -30,16 +52,4 @@ app.add_middleware(
 )
 
 # Inclua rotas
-app.include_router(exemplo_controller.router)
 app.include_router(path_check_controller.router)
-
-
-# Logging de Inicialização
-@app.on_event("startup")
-async def startup_event():
-    logger.info("A aplicação FastAPI foi iniciada.")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info("A aplicação FastAPI está sendo encerrada.")

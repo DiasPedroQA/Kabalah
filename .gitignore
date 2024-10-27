@@ -162,4 +162,4 @@ cython_debug/
 #.idea/
 
 # Pasta de Lixeira temporária
-.trash/
+trash/
