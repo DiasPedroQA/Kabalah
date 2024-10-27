@@ -1,0 +1,129 @@
+{
+    // Configurações de exclusão de arquivos e pastas
+    "files.exclude": {
+        ".venv": false, ".gitignore": false, "*.md": false,  "**/*.pyc": false,
+        ".github": false, "*.toml": false, "**/__init__.py": true, "*.ini": false,
+        "**/__pycache__": true, ".coverage": false, ".flake8": false, ".mypy_cache": true,
+        ".pylintrc": true, ".pytest_cache": true, ".zzz": true, "htmlcov": true,
+        "LICENSE": true, "requirements.in": false, "requirements.txt": false, "venv": true
+    },
+
+    // Lista de palavras personalizadas para correção ortográfica
+    "cSpell.words": [
+        "acao",
+        "adicao",
+        "aplicacao",
+        "apresentacao",
+        "arquivos",
+        "autoflush",
+        "backref",
+        "caplog",
+        "codemirror",
+        "commitadas",
+        "configuracao",
+        "consts",
+        "conteudo",
+        "criacao",
+        "diretorio",
+        "diretorios",
+        "docparams",
+        "docstrings",
+        "dominio",
+        "errorcode",
+        "espacos",
+        "fastapi",
+        "inicializacao",
+        "integracao",
+        "invalidos",
+        "ipython",
+        "isort",
+        "kernelspec",
+        "levelname",
+        "linux",
+        "maxfail",
+        "modificacao",
+        "mypy",
+        "mysql",
+        "nbconvert",
+        "nbformat",
+        "nullable",
+        "onupdate",
+        "oper",
+        "pycache",
+        "pydantic",
+        "pygments",
+        "pylint",
+        "Pylint",
+        "pylintrc",
+        "pyproject",
+        "pytest",
+        "rcfile",
+        "relacao",
+        "repositorio",
+        "repositorios",
+        "requisicao",
+        "requisicoes",
+        "saida",
+        "sanitizacao",
+        "scandir",
+        "serialização",
+        "servico",
+        "Servico",
+        "servicos",
+        "sessao",
+        "sessionmaker",
+        "signoff",
+        "sqlalchemy",
+        "SQLAlchemy",
+        "starlette",
+        "subcaminhos",
+        "subpacotes",
+        "tb_arquivos",
+        "tb_diretorios",
+        "tb_tags_html",
+        "topdown",
+        "usuario",
+        "Usuarios",
+        "uvicorn",
+        "validacao",
+        "venv",
+        "xdist"
+    ],
+
+    // Diretórios adicionais para a análise de código Python
+    "python.analysis.extraPaths": [
+        "src",
+        "tests"
+    ],
+
+    // Configurações de edição
+    "editor.rulers": [95],
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "editor.wordWrap": "on",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.trimTrailingWhitespace": true,                // Remove espaços ao salvar
+
+    // Configurações de IntelliSense
+    "python.analysis.autoImportCompletions": true,       // Auto completar importações
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnusedVariable": "warning"       // Aviso para variáveis não utilizadas
+    },
+
+    // Linter e formatação
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,                // Ativar Flake8
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintArgs": ["--max-line-length=95"],
+    "python.sortImports.args": ["--profile", "black"],   // Importação ordenada com isort
+
+    // Configurações de testes em Python
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests"
+    ]
+}
