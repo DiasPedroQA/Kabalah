@@ -1,15 +1,9 @@
 # pylint: disable=C
 
-import os
 import re
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, field_validator
 from pathlib import Path
-from dotenv import load_dotenv
-
-# Carregar variáveis de ambiente
-load_dotenv()
-USERNAME = os.getenv("USERNAME")
 
 router = APIRouter()
 
@@ -30,7 +24,7 @@ class RequisicaoVerificacaoCaminho(BaseModel):
 
 
 def verificar_caminho_logica(caminho: str) -> dict:
-    caminho_absoluto = Path(f"/home/{USERNAME}").joinpath(caminho).resolve()
+    caminho_absoluto = Path("/home/pedro-pm-dias/").joinpath(caminho).resolve()
     print(f"Verificando caminho: {caminho_absoluto}")
 
     # Verifica se o caminho existe
