@@ -5,26 +5,84 @@
     // Configuração do framework de testes como pytest
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
-    
-    // Diretório para rodar os testes, apontando para a pasta 'tests'
-    "python.testing.pytestArgs": [ "tests" ],
+    "python.testing.pytestArgs": ["tests"],  // Diretório para rodar os testes
 
-    // Configuração para formatação automática com Black
+    // Configuração para formatação automática com Black e isort para organizar imports
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": true,  // Ativa formatação automática ao salvar
+    "editor.formatOnPaste": true, // Formatação automática ao colar
+    "python.formatting.provider": "black",
+    "python.sortImports.args": ["--profile", "black"],  // Perfil do isort para combinar com Black
 
     // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
     "files.exclude": {
         "**/__pycache__": true,
         "**/.pytest_cache": true,
-        "**/.trash": false
+        "**/.trash": false,
+        "**/.venv": true,  // Oculta o ambiente virtual se ele estiver na pasta do projeto
+        "**/*.egg-info": true  // Oculta diretórios de metadados de pacotes
     },
 
     // Configurações adicionais de intellisense e análise de código
-    "python.analysis.extraPaths": [ "src" ],
+    "python.analysis.extraPaths": ["src"],
 
-    // Ignorar erros em arquivos de teste
-    "python.analysis.ignore": [ "tests" ]
+    // Ignorar erros em arquivos de teste e alguns padrões de erro irrelevantes
+    "python.analysis.ignore": ["tests"],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportOptionalSubscript": "none",
+        "reportGeneralTypeIssues": "warning"
+    },
+
+    // Ignorar erros de lint em algumas pastas
+    "python.linting.pylintArgs": [
+        "--ignore=tests,docs"  // Ignorar pastas "tests" e "docs"
+    ],
+
+    // Configurações para a régua e desativação do minimapa
+    "editor.rulers": [95],  // Adiciona régua vertical em 95 caracteres para guiar o comprimento das linhas
+    "editor.minimap.enabled": false,  // Desativa o minimapa lateral
+
+    // Configuração do Linting com Pylint e MyPy
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyArgs": ["--ignore-missing-imports"],  // Ignora imports faltantes no MyPy
+
+    // Atalhos de controle de testes para execução e depuração no Pytest
+    "testing.defaultGutterClickAction": "debug",  // Ao clicar, depurar o teste por padrão
+    "testing.autoRun": "all",  // Executar testes automaticamente ao salvar
+
+    // Suporte para snippets e variáveis predefinidas para Python
+    "editor.snippetSuggestions": "top",  // Mostra snippets no topo das sugestões
+    "python.envFile": "${workspaceFolder}/.env",  // Arquivo de ambiente para variáveis de ambiente
+
+    // Configurações de palavras para evitar marcação de palavras técnicas como erros ortográficos
+    "cSpell.words": [
+        "commitadas", "docparams", "docstrings", "isort", "maxfail",
+        "mypy", "pycache", "pylint", "pylintrc", "pytest", "rcfile", "xdist",
+        "vscode", "asyncio", "jsonc", "utf", "pep8", "argparse"
+    ],
+
+    // Integração do Prettier para formatação de JSON e outros arquivos não-Python
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+
+    // Configurações adicionais para arquivos Markdown
+    "markdownlint.config": {
+        "MD013": false,  // Permite linhas longas em Markdown
+        "MD033": false   // Permite HTML em Markdown
+    },
+
+    // Outras configurações úteis para produtividade e navegação
+    "explorer.confirmDelete": false,  // Remove confirmação ao excluir arquivos
+    "explorer.sortOrder": "type",  // Ordena arquivos e pastas por tipo
+    "workbench.colorTheme": "Default Dark+",  // Tema escuro padrão
+    "workbench.startupEditor": "newUntitledFile",  // Abre um novo arquivo vazio ao iniciar o VS Code
+    "window.zoomLevel": 1  // Nível de zoom da interface
 }
