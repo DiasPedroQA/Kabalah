@@ -1,18 +1,32 @@
-"""
-Configura o módulo de logging com uma configuração básica.
-
-O nível de logging é definido como `logging.INFO`
-e o formato da mensagem de log é definido como `%(message)s`.
-
-Uma instância de logger é criada com o nome do
-módulo atual (`__name__`), que pode ser usada para
-registrar mensagens ao longo do módulo.
-"""
-
 # src/logging/logger.py
 
-import logging
+"""
+Este módulo fornece funções para criar e configurar loggers.
+"""
 
-# Configuração do logger
-logging.basicConfig(level=logging.INFO, format='%(message)s')
-logger = logging.getLogger(__name__)
+import logging
+import os
+
+
+def setup_logging(log_file='app.log', log_level=logging.INFO):
+    """Configura o logging para a aplicação."""
+
+    # Cria o diretório para o log se não existir
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+
+    # Configura o formato do log
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(os.path.join('logs', log_file)),
+            logging.StreamHandler(),  # Para exibir no console
+        ],
+    )
+
+
+# Função para obter um logger
+def get_logger(name):
+    """Retorna um logger com o nome especificado."""
+    return logging.getLogger(name)
