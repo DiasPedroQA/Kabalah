@@ -5,7 +5,8 @@
 # Definir o comprimento máximo de linha como 95 caracteres, o que é compatível com o Black.
 max-line-length = 95
 
-# Ignorar erros específicos para evitar falsos positivos ou para se adequar às suas preferências de estilo:
+# Ignorar erros específicos para evitar falsos positivos
+# ou para se adequar às suas preferências de estilo:
 # - E501: Linha muito longa (não necessário já que definimos o tamanho máximo).
 # - W503: Quebra de linha antes de um operador binário.
 # - C901: Função com complexidade ciclomatica alta (permite funções com mais argumentos).
@@ -22,7 +23,8 @@ exclude =
     build,
     dist
 
-# Definir a complexidade ciclomatica máxima. Valores maiores indicam que a função precisa ser simplificada.
+# Definir a complexidade ciclomatica máxima.
+# Valores maiores indicam que a função precisa ser simplificada.
 max-complexity = 10
 
 # Selecionar códigos específicos para análise, abordando erros e padrões de código.

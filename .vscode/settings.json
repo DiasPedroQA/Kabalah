@@ -13,14 +13,12 @@
     },
     "editor.formatOnSave": true,  // Ativa formatação automática ao salvar
     "editor.formatOnPaste": true, // Formatação automática ao colar
-    "python.formatting.provider": "black",
-    "python.sortImports.args": ["--profile", "black"],  // Perfil do isort para combinar com Black
 
     // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
     "files.exclude": {
         "**/__pycache__": true,
         "**/.pytest_cache": true,
-        "**/.trash": false,
+        "**/trash": false,
         "**/.venv": true,  // Oculta o ambiente virtual se ele estiver na pasta do projeto
         "**/*.egg-info": true  // Oculta diretórios de metadados de pacotes
     },
@@ -35,24 +33,13 @@
         "reportGeneralTypeIssues": "warning"
     },
 
-    // Ignorar erros de lint em algumas pastas
-    "python.linting.pylintArgs": [
-        "--ignore=tests,docs"  // Ignorar pastas "tests" e "docs"
-    ],
-
     // Configurações para a régua e desativação do minimapa
     "editor.rulers": [95],  // Adiciona régua vertical em 95 caracteres para guiar o comprimento das linhas
     "editor.minimap.enabled": false,  // Desativa o minimapa lateral
 
-    // Configuração do Linting com Pylint e MyPy
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
-    "python.linting.mypyEnabled": true,
-    "python.linting.mypyArgs": ["--ignore-missing-imports"],  // Ignora imports faltantes no MyPy
 
     // Atalhos de controle de testes para execução e depuração no Pytest
     "testing.defaultGutterClickAction": "debug",  // Ao clicar, depurar o teste por padrão
-    "testing.autoRun": "all",  // Executar testes automaticamente ao salvar
 
     // Suporte para snippets e variáveis predefinidas para Python
     "editor.snippetSuggestions": "top",  // Mostra snippets no topo das sugestões
@@ -71,12 +58,6 @@
     },
     "[markdown]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-
-    // Configurações adicionais para arquivos Markdown
-    "markdownlint.config": {
-        "MD013": false,  // Permite linhas longas em Markdown
-        "MD033": false   // Permite HTML em Markdown
     },
 
     // Outras configurações úteis para produtividade e navegação
