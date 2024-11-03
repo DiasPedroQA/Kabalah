@@ -1,56 +1,88 @@
 # src/main.py
 
 """
-Exemplo de uso das classes `FilePathModel` e `FolderPathModel`.
+Módulo principal para executar o Gerenciador de Caminhos.
 
-O `FilePathModel` representa um caminho de arquivo,
-enquanto `FolderPathModel` representa um caminho de pasta.
-Este exemplo demonstra como usar cada método importante em ambas as classes.
+Este script inicializa e utiliza a classe GerenciadorCaminhos para verificar e
+exibir informações sobre um caminho especificado pelo usuário. A aplicação é capaz de:
+    - Identificar o tipo do caminho (arquivo ou pasta).
+    - Listar todos os arquivos presentes em um diretório.
+    - Filtrar e exibir arquivos com extensão `.html`.
+
+Caso nenhum caminho seja fornecido como argumento ao rodar o script, ele utiliza um
+caminho padrão.
+
+Exemplo de uso:
+    python src/main.py /caminho/para/diretorio_ou_arquivo
+
+Dependências:
+    - controllers.GerenciadorCaminhos: Classe que gerencia operações sobre o caminho.
+    - sys, typing.List
+
+Exceções:
+    - IOError: Levantada em caso de problemas de I/O com o sistema de arquivos.
+    - OSError: Levantada em caso de erro do sistema ao acessar o caminho.
+    - ValueError: Levantada para indicar um caminho inválido.
 """
 
-from models.path_model import FilePathModel, FolderPathModel
+import sys
+from controllers import GerenciadorCaminhos
 
 
-def show_path_info(model, type_name):
-    """Função auxiliar para imprimir informações sobre um caminho."""
-    print(f"\n### Informações do objeto {type_name} ###\n")
-    print("Caminho:", model.path)
-    print("É um caminho absoluto?", model.is_path_absolute())
-    print("É um arquivo?", model.is_path_file())
-    print("É uma pasta?", model.is_path_folder())
+def main(caminho: str) -> None:
+    """Função principal para executar o gerenciamento de caminhos.
 
-
-def main(caminho_arquivo: str, caminho_pasta: str):
+    Argumentos:
+        caminho (str): O caminho a ser gerenciado.
     """
-    Função principal que demonstra o uso das classes `FilePathModel` e `FolderPathModel`.
+    try:
+        gerenciador = GerenciadorCaminhos(caminho)
+        exibir_informacoes(gerenciador)
+    except (IOError, OSError) as e:
+        print(f"Erro de sistema ao acessar o caminho: {e}")
+    except ValueError as ve:
+        print(f"Erro: {ve}")
+
+
+def exibir_informacoes(gerenciador: GerenciadorCaminhos) -> None:
+    """Exibe informações sobre o caminho gerenciado.
+
+    Argumentos:
+        gerenciador (GerenciadorCaminhos): A instância do gerenciador de caminhos.
     """
+    # Exibir tipo do caminho
+    tipo = gerenciador.tipo_caminho()
+    print(f"O caminho fornecido é um(a): {tipo}\n")
 
-    # Exemplo 1: Utilizando FilePathModel para representar e manipular um caminho de arquivo
-    file_model = FilePathModel(caminho_arquivo)
+    if arquivos := gerenciador.listar_todos_os_arquivos():
+        print("Arquivos encontrados:")
+        for arquivo in arquivos:
+            print(f"- {arquivo}")
+    else:
+        print("Nenhum arquivo encontrado na pasta.\n")
 
-    show_path_info(file_model, "Arquivo")
-    print("Extensão do arquivo:", file_model.get_extension())
-    # print("Representação JSON do objeto de arquivo:", file_model.to_obj_json())
-
-    # Exemplo 2: Utilizando FolderPathModel para representar e manipular um caminho de pasta
-    folder_model = FolderPathModel(caminho_pasta)
-
-    show_path_info(folder_model, "Pasta")
-
-    print("\nConteúdo da pasta:", caminho_pasta)
-    conteudo_pasta = folder_model.list_contents(depth=1)
-
-    for item in conteudo_pasta:
-        print(
-            f"- {item.path} (Tipo: {'Arquivo' if isinstance(item, FilePathModel) else 'Pasta'})"
-        )
-        print(f"    - Item inteiro: {item.to_obj_json()}\n\n")
-
-    # print("\nRepresentação JSON do objeto de pasta:", folder_model.to_obj_json())
+    if arquivos_html := gerenciador.filtrar_arquivos_html():
+        print("\nArquivos .html encontrados:")
+        for arquivo_html in arquivos_html:
+            print(f"- {arquivo_html.file_path}")
+    else:
+        print("Nenhum arquivo .html encontrado.\n")
 
 
 if __name__ == "__main__":
-    file_path: str = "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html"
-    folder_path: str = "/home/pedro-pm-dias/Downloads/"
+    # Verifica se um caminho foi passado como argumento ou usa um padrão
+    caminho_usuario = sys.argv[1] if len(sys.argv) > 1 else "/home/pedro-pm-dias/Downloads/"
+    main(caminho=caminho_usuario)
 
-    main(caminho_arquivo=file_path, caminho_pasta=folder_path)
+# file_path: str = "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html"
+# folder_path: str = "/home/pedro-pm-dias/Downloads/"
+#
+# def processar(caminho: str) -> None:
+#     gerenciador_caminhos = GerenciadorCaminhos(caminho)
+#     arquivos_html = gerenciador_caminhos.filtrar_arquivos_html()
+
+#     for arquivo in arquivos_html:
+#         dados = GerenciadorRaspagem.raspar_dados_html(arquivo)
+#         nome_pdf = f"{os.path.splitext(os.path.basename(arquivo.file_path))[0]}.pdf"
+#         GerenciadorEscritaPDF.criar_pdf(dados, nome_pdf)
+#         print(f"Arquivo PDF criado: {nome_pdf}")

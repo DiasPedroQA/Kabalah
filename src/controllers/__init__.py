@@ -1,17 +1,13 @@
-"""
-Módulo de inicialização para o pacote de controllers.
-
-Este módulo expõe o roteador `path_check_router` do módulo
-`path_check_controller`, permitindo que ele seja facilmente
-importado e utilizado na aplicação principal.
-
-Exports:
-    path_check_router (APIRouter): O roteador para análise de caminhos.
-"""
-
 # src/controllers/__init__.py
 
-from .path_check_controller import router as path_check_router
+"""
+Este módulo fornece classes para gerenciar e processar caminhos de arquivos e pastas.
 
-# Exporta o router para ser facilmente incluído no main
-__all__ = ["path_check_router"]
+As classes disponíveis incluem:
+- GerenciadorCaminhos: Gerencia a identificação e filtragem de arquivos em um caminho.
+"""
+
+from .path_controller import GerenciadorCaminhos
+
+
+__all__ = ["GerenciadorCaminhos"]

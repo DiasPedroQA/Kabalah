@@ -18,6 +18,7 @@
     "files.exclude": {
         "**/__pycache__": true,
         "**/.pytest_cache": true,
+        "**/__init__.py": true,
         "**/trash": false,
         "**/.venv": true,  // Oculta o ambiente virtual se ele estiver na pasta do projeto
         "**/*.egg-info": true  // Oculta diretórios de metadados de pacotes
