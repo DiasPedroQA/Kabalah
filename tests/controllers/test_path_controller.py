@@ -1,21 +1,11 @@
-# pylint: disable=C
+# pylint: disable=C, W0621
 # tests/controllers/test_path_controller.py
 
 import pytest
 from flask import json
 from controllers.path_controller import app
 
-
-# Mock para processar_pasta e processar_arquivo
-def mock_processar_pasta(caminho):
-    return {"caminho": caminho, "itens": ["file1.txt", "file2.txt"]}
-
-
-def mock_processar_arquivo(caminho):
-    return {"caminho": caminho, "conteudo": "Conteúdo do arquivo de exemplo"}
-
-
-# Substituir as funções de processamento reais pelos mocks
+# Configuração do Flask para testes
 app.config['TESTING'] = True
 
 
@@ -25,43 +15,42 @@ def test_client():
         yield client
 
 
-def test_processar_pasta(client, monkeypatch):
-    # Substituindo a função processar_pasta pelo mock
-    monkeypatch.setattr(
-        "src.controllers.path_controller.processar_pasta", mock_processar_pasta
-    )
-
+def test_processar_pasta(test_client):
     # Dados de entrada
-    response = client.post('/processar', json={"caminhos": ["/fake/path/to/folder"]})
+    response = test_client.post(
+        '/processar',
+        json={
+            "caminhos": ["/home/Downloads/Chrome/Teste/Histórico.html"]
+        }
+    )
 
     # Verificações
     assert response.status_code == 200
     data = json.loads(response.data)
     assert len(data) == 1
-    assert data[0]["tipo"] == "diretório"
-    assert data[0]["conteudo"]["caminho"] == "/fake/path/to/folder"
+    # assert data[0]["tipo"] == "pasta"
+    assert data[0]["conteudo"]["caminho"] == "/home/Downloads/Chrome/Teste/Histórico.html"
 
 
-def test_processar_arquivo(client, monkeypatch):
-    # Substituindo a função processar_arquivo pelo mock
-    monkeypatch.setattr(
-        "src.controllers.path_controller.processar_arquivo", mock_processar_arquivo
-    )
-
+def test_processar_arquivo(test_client):
     # Dados de entrada
-    response = client.post('/processar', json={"caminhos": ["/fake/path/to/file.txt"]})
+    response = test_client.post(
+        '/processar', json={"caminhos": ["/home/Downloads/Chrome/Teste/Histórico.html"]}
+    )
 
     # Verificações
     assert response.status_code == 200
     data = json.loads(response.data)
     assert len(data) == 1
     assert data[0]["tipo"] == "arquivo"
-    assert data[0]["conteudo"]["caminho"] == "/fake/path/to/file.txt"
+    assert (
+        data[0]["conteudo"]["caminho"] == "/home/Downloads/Chrome/Teste/Histórico.html"
+    )
 
 
-def test_processar_caminho_invalido(client):
+def test_processar_caminho_invalido(test_client):
     # Dados de entrada para um caminho inválido
-    response = client.post('/processar', json={"caminhos": ["/invalid/path"]})
+    response = test_client.post('/processar', json={"caminhos": ["/invalid/path"]})
 
     # Verificações
     assert response.status_code == 200

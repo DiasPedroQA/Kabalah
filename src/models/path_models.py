@@ -123,7 +123,7 @@ def processar_arquivo(caminho):
 #                     conteudo_identificado.append(folder_model)
 #                     conteudo_identificado.extend(folder_model.list_contents(depth - 1))
 #         except FileNotFoundError:
-#             self.logger.error(f"Arquivo ou diretório não encontrado: {self.path}")
+#             self.logger.error(f"Arquivo ou pasta não encontrado: {self.path}")
 #         except PermissionError:
 #             self.logger.error(f"Erro de permissão ao acessar {self.path}")
 #         except OSError as e:

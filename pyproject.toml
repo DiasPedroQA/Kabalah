@@ -10,7 +10,7 @@ line-length = 95
 # Evitar a normalização automática de strings (aspas duplas para aspas simples).
 skip-string-normalization = true
 
-# Excluir diretórios e arquivos do processo de formatação do Black.
+# Excluir pastas e arquivos do processo de formatação do Black.
 exclude = '''
 /(
     \.git
@@ -34,7 +34,7 @@ max-line-length = 95
 # Ignorar códigos de erro que já foram ajustados no arquivo `.flake8`.
 ignore = ["E0401", "C901", "E501", "W503"]
 
-# Diretórios e arquivos que não precisam ser verificados.
+# pastas e arquivos que não precisam ser verificados.
 exclude = ".git,__pycache__,docs/source/conf.py,old,build,dist,migrations"
 
 [tool.pylint]
@@ -52,7 +52,7 @@ line_length = 95
 known_third_party = ["flask", "sqlalchemy", "pytest"]
 known_first_party = ["src"]
 
-# Excluir diretórios dos quais o isort não deve organizar imports.
+# Excluir pastas dos quais o isort não deve organizar imports.
 skip = ["migrations", "build", "dist"]
 
 [tool.mypy]
@@ -83,7 +83,7 @@ minversion = "6.0"
 # Opções para o pytest: testes serão executados com cobertura de código.
 addopts = "--strict-markers --tb=short --cov=src --cov-fail-under=75"
 
-# Diretórios onde os testes estão localizados.
+# pastas onde os testes estão localizados.
 testpaths = [
     "tests"
 ]

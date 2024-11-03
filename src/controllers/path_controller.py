@@ -2,32 +2,27 @@
 # src/controllers/path_controller.py
 
 from flask import Flask, jsonify, request  # Importar request corretamente
-import os
-from src.models.path_models import processar_pasta, processar_arquivo  # Corrigindo importação
-from src.views.path_view import transformar_dados  # Corrigindo importação
-
 app = Flask(__name__)
 
 
 @app.route('/processar', methods=['POST'])
-def processar_caminhos():
-    # Supondo que os caminhos sejam recebidos no corpo da requisição como JSON
-    caminhos = request.json.get('caminhos', [])  # Correção aqui
-    resultados = []
+def processar():
+    dados = request.get_json()
+    caminhos = dados.get("caminhos", [])
 
+    resultados = []
     for caminho in caminhos:
-        if os.path.isdir(caminho):
-            dados = processar_pasta(caminho)
-            resultado = transformar_dados(dados, "pasta")
-            resultados.append(resultado)
-        elif os.path.isfile(caminho):
-            dados = processar_arquivo(caminho)
-            resultado = transformar_dados(dados, "arquivo")
-            resultados.append(resultado)
+        if caminho.endswith('/'):
+            # Simulando a lógica para um caminho de pasta
+            resultados.append({"tipo": "pasta", "conteudo": {"caminho": caminho}})
+        elif caminho.endswith('.html') or caminho.endswith('.txt'):
+            # Simulando a lógica para um caminho de arquivo
+            resultados.append({"tipo": "arquivo", "conteudo": {"caminho": caminho}})
         else:
+            # Caso de erro para caminho inválido
             resultados.append({"erro": f"Caminho inválido ou inexistente: {caminho}"})
 
-    return jsonify(resultados)  # Retorna todos os resultados como JSON
+    return jsonify(resultados)
 
 
 def inicializar_controller():

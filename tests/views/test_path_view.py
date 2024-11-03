@@ -12,7 +12,7 @@ def test_transformar_dados_pasta():
     tipo = "pasta"
 
     expected_result = {
-        "tipo": "diretório",
+        "tipo": "pasta",
         "conteudo": dados,
         "mensagem": "Processamento completo para a pasta: /home/pedro-pm-dias/Downloads/folder1",
     }

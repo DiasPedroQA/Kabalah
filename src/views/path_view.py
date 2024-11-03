@@ -15,7 +15,7 @@ def transformar_dados(dados, tipo):
     """
     if tipo == "pasta":
         return {
-            "tipo": "diretório",
+            "tipo": "pasta",
             "conteudo": dados,
             "mensagem": f"Processamento completo para a pasta: {dados.get('caminho', 'caminho não especificado')}",
         }
