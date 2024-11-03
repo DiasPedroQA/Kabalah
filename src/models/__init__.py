@@ -12,6 +12,6 @@ Essas classes oferecem uma maneira consistente de trabalhar com caminhos
 do sistema de arquivos na sua aplicação.
 """
 
-from .path_models import PathModel, FilePathModel, FolderPathModel
+# from .path_models import PathModel, FilePathModel, FolderPathModel
 
-__all__ = ["PathModel", "FilePathModel", "FolderPathModel"]
+# __all__ = ["PathModel", "FilePathModel", "FolderPathModel"]

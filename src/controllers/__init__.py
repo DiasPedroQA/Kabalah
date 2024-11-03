@@ -7,7 +7,7 @@ As classes disponíveis incluem:
 - GerenciadorCaminhos: Gerencia a identificação e filtragem de arquivos em um caminho.
 """
 
-from .path_controller import GerenciadorCaminhos
+# from .path_controller import GerenciadorCaminhos
 
 
-__all__ = ["GerenciadorCaminhos"]
+# __all__ = ["GerenciadorCaminhos"]

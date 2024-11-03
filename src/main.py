@@ -1,88 +1,46 @@
+# pylint: disable=C
 # src/main.py
 
-"""
-Módulo principal para executar o Gerenciador de Caminhos.
-
-Este script inicializa e utiliza a classe GerenciadorCaminhos para verificar e
-exibir informações sobre um caminho especificado pelo usuário. A aplicação é capaz de:
-    - Identificar o tipo do caminho (arquivo ou pasta).
-    - Listar todos os arquivos presentes em um diretório.
-    - Filtrar e exibir arquivos com extensão `.html`.
-
-Caso nenhum caminho seja fornecido como argumento ao rodar o script, ele utiliza um
-caminho padrão.
-
-Exemplo de uso:
-    python src/main.py /caminho/para/diretorio_ou_arquivo
-
-Dependências:
-    - controllers.GerenciadorCaminhos: Classe que gerencia operações sobre o caminho.
-    - sys, typing.List
-
-Exceções:
-    - IOError: Levantada em caso de problemas de I/O com o sistema de arquivos.
-    - OSError: Levantada em caso de erro do sistema ao acessar o caminho.
-    - ValueError: Levantada para indicar um caminho inválido.
-"""
-
-import sys
-from controllers import GerenciadorCaminhos
+import os
+from controllers.path_controller import inicializar_controller
+from models.path_models import processar_pasta, processar_arquivo
+from src.views.path_view import transformar_dados
 
 
-def main(caminho: str) -> None:
-    """Função principal para executar o gerenciamento de caminhos.
+def processar_caminhos(caminhos):
+    resultados = []
 
-    Argumentos:
-        caminho (str): O caminho a ser gerenciado.
-    """
-    try:
-        gerenciador = GerenciadorCaminhos(caminho)
-        exibir_informacoes(gerenciador)
-    except (IOError, OSError) as e:
-        print(f"Erro de sistema ao acessar o caminho: {e}")
-    except ValueError as ve:
-        print(f"Erro: {ve}")
+    for caminho in caminhos:
+        if os.path.isdir(caminho):
+            dados = processar_pasta(caminho)
+            resultado = transformar_dados(dados, "pasta")
+            resultados.append(resultado)
+        elif os.path.isfile(caminho):
+            dados = processar_arquivo(caminho)
+            resultado = transformar_dados(dados, "arquivo")
+            resultados.append(resultado)
+        else:
+            resultados.append({"erro": f"Caminho inválido ou inexistente: {caminho}"})
+
+    # Aqui você pode querer fazer algo com os resultados
+    return resultados
 
 
-def exibir_informacoes(gerenciador: GerenciadorCaminhos) -> None:
-    """Exibe informações sobre o caminho gerenciado.
+def principal():
+    # Caminhos fictícios para as pastas e arquivos
+    folder_path1 = "/home/pedro-pm-dias/Downloads/folder1"
+    folder_path2 = "/home/pedro-pm-dias/Downloads/folder2"
+    file_path1 = "/home/pedro-pm-dias/Downloads/file1.txt"
+    file_path2 = "/home/pedro-pm-dias/Downloads/file2.txt"
 
-    Argumentos:
-        gerenciador (GerenciadorCaminhos): A instância do gerenciador de caminhos.
-    """
-    # Exibir tipo do caminho
-    tipo = gerenciador.tipo_caminho()
-    print(f"O caminho fornecido é um(a): {tipo}\n")
+    # Processamento dos caminhos pelo controller
+    caminhos = [folder_path1, folder_path2, file_path1, file_path2]
+    resultados = processar_caminhos(caminhos)
+    print(resultados)
 
-    if arquivos := gerenciador.listar_todos_os_arquivos():
-        print("Arquivos encontrados:")
-        for arquivo in arquivos:
-            print(f"- {arquivo}")
-    else:
-        print("Nenhum arquivo encontrado na pasta.\n")
-
-    if arquivos_html := gerenciador.filtrar_arquivos_html():
-        print("\nArquivos .html encontrados:")
-        for arquivo_html in arquivos_html:
-            print(f"- {arquivo_html.file_path}")
-    else:
-        print("Nenhum arquivo .html encontrado.\n")
+    # Inicialização da API
+    inicializar_controller()
 
 
 if __name__ == "__main__":
-    # Verifica se um caminho foi passado como argumento ou usa um padrão
-    caminho_usuario = sys.argv[1] if len(sys.argv) > 1 else "/home/pedro-pm-dias/Downloads/"
-    main(caminho=caminho_usuario)
-
-# file_path: str = "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html"
-# folder_path: str = "/home/pedro-pm-dias/Downloads/"
-#
-# def processar(caminho: str) -> None:
-#     gerenciador_caminhos = GerenciadorCaminhos(caminho)
-#     arquivos_html = gerenciador_caminhos.filtrar_arquivos_html()
-
-#     for arquivo in arquivos_html:
-#         dados = GerenciadorRaspagem.raspar_dados_html(arquivo)
-#         nome_pdf = f"{os.path.splitext(os.path.basename(arquivo.file_path))[0]}.pdf"
-#         GerenciadorEscritaPDF.criar_pdf(dados, nome_pdf)
-#         print(f"Arquivo PDF criado: {nome_pdf}")
+    principal()
