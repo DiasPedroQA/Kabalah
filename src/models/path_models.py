@@ -1,133 +1,244 @@
-# pylint: disable=C
 # src/models/path_models.py
 
-
-def processar_pasta(caminho):
-    # Retorna dados fictícios de uma pasta
-    return {"caminho": caminho, "itens": ["file1.txt", "file2.txt", "subfolder"]}
+from pathlib import Path
+import json
 
 
-def processar_arquivo(caminho):
-    # Retorna dados fictícios de um arquivo
-    return {"caminho": caminho, "conteudo": "Conteúdo do arquivo de exemplo"}
+class EstruturaResposta:
+    """
+    Classe responsável por gerar a estrutura padronizada de respostas para a análise de caminhos.
+    """
+
+    @staticmethod
+    def gerar_resposta(caminho, sucesso, dados=None, mensagem=None):
+        """
+        Gera uma resposta padronizada no formato de dicionário.
+
+        Parâmetros:
+        caminho (str): Caminho do arquivo ou pasta.
+        sucesso (bool): Indica se a operação foi bem-sucedida ou não.
+        dados (dict, opcional): Dados adicionais a serem incluídos na resposta (caso haja).
+        mensagem (str, opcional): Mensagem de erro ou sucesso.
+
+        Retorna:
+        dict: Estrutura padronizada de resposta.
+        """
+        return {
+            "caminho": str(caminho),
+            "resultado": "sucesso" if sucesso else "erro",
+            "dados": dados,
+            "mensagem": mensagem,
+        }
 
 
-# class PathModel:
-#     """Classe base para representar um caminho no sistema de arquivos."""
+class CaminhoBase:
+    """
+    Classe base abstrata para representar um caminho e fornecer métodos comuns.
 
-#     def __init__(self, modelpath: str):
-#         """
-#         Inicializa o modelo de caminho com o caminho especificado.
+    Métodos:
+    __init__(caminho): Inicializa a classe com o caminho fornecido e verifica se o caminho existe.
+    analisar(): Método abstrato que deve ser implementado nas subclasses.
+    """
 
-#         Argumento(s):
-#             modelpath (str): O caminho a ser representado.
-#         """
-#         self.path: Path = Path(modelpath)  # Usando Path do pathlib
-#         self.logger = CustomLogger(__name__)  # Instância do logger
+    def __init__(self, caminho):
+        """
+        Inicializa a classe com o caminho fornecido.
 
-#     def is_path_folder(self) -> bool:
-#         """Verifica se o caminho é uma pasta."""
-#         return self.path.is_dir()
+        Parâmetros:
+        caminho (str): Caminho para um arquivo ou pasta.
 
-#     def is_path_file(self) -> bool:
-#         """Verifica se o caminho é um arquivo."""
-#         return self.path.is_file()
+        Levanta:
+        ValueError: Se o caminho não existe.
+        """
+        self._caminho = Path(caminho)
+        if not self._caminho.exists():
+            raise ValueError(f"O caminho {caminho} não existe")
 
-#     def is_path_absolute(self) -> bool:
-#         """Verifica se o caminho é absoluto."""
-#         return self.path.is_absolute()
+    def analisar(self):
+        """
+        Método abstrato para análise do caminho. Deve ser implementado pelas subclasses.
 
-#     def to_obj_json(self) -> str:
-#         """Retorna um JSON representando o modelo."""
-#         obj_data = {
-#             str(self.path): {
-#                 "is_absolute": self.is_path_absolute(),
-#                 "is_folder": self.is_path_folder(),
-#                 "is_file": self.is_path_file(),
-#             },
-#         }
+        Levanta:
+        NotImplementedError: Quando não implementado nas subclasses.
+        """
+        raise NotImplementedError("Método deve ser implementado nas subclasses.")
 
-#         if hasattr(self, "get_file_extension"):
-#             obj_data["file_extension"] = self.get_file_extension()
+    def validar_caminho(self):
+        """
+        Valida se o caminho fornecido existe.
 
-#         if hasattr(self, "list_contents"):
-#             obj_data["contents"] = [item.to_obj_json() for item in self.list_contents()]
-
-#         return json.dumps(obj_data, ensure_ascii=False, indent=4)
-
-
-# class FilePathModel(PathModel):
-#     """Representa um caminho de arquivo, herdando de PathModel."""
-
-#     def __init__(self, filepath: str):
-#         """Inicializa o modelo de caminho de arquivo com o caminho especificado."""
-#         super().__init__(filepath)
-#         self.file_path = filepath
-#         self.file_size: int = self.get_file_size()  # Tamanho do arquivo em bytes
-#         self.file_extension: str = self.get_file_extension()  # Extensão do arquivo
-
-#     def get_file_extension(self) -> str:
-#         """Obtém a extensão do arquivo."""
-#         if not self.is_path_file():
-#             self.logger.warning(
-#                 f"Tentativa de obter extensão de {self.path} que não é um arquivo."
-#             )
-#             return "Not Found"
-#         return self.path.suffix  # Usando suffix do pathlib
-
-#     def get_file_size(self) -> int:
-#         """Obtém o tamanho do arquivo."""
-#         if not self.is_path_file():
-#             self.logger.warning(
-#                 f"Tentativa de obter tamanho de {self.path} que não é um arquivo."
-#             )
-#             return 0
-#         return self.path.stat().st_size  # Usando stat() do pathlib
+        Levanta:
+        ValueError: Se o caminho não existe.
+        """
+        if not self._caminho.exists():
+            raise ValueError(f"O caminho {self._caminho} não existe")
 
 
-# class FolderPathModel(PathModel):
-#     """Representa um caminho de pasta, herdando de PathModel."""
+class AnalisadorDeArquivos(CaminhoBase):
+    """
+    Classe para análise de arquivos específicos. Herda de `CaminhoBase`.
 
-#     def __init__(self, folderpath: str):
-#         """Inicializa o modelo de caminho de pasta com o caminho especificado."""
-#         super().__init__(folderpath)
-#         self.num_contents: int = self.count_contents()  # Número de itens na pasta
-#         self.contents: List[Union[FilePathModel, 'FolderPathModel']] = []  # Lista de conteúdos
+    Métodos:
+    analisar(): Realiza a análise de um arquivo,
+    coletando informações como tamanho, nome e extensão.
+    """
 
-#     def count_contents(self) -> int:
-#         """Conta o número de itens na pasta."""
-#         if not self.is_path_folder():
-#             self.logger.warning(
-#                 f"Tentativa de contar itens de {self.path} que não é uma pasta."
-#             )
-#             return 0
-#         return len(list(self.path.iterdir()))  # Usando iterdir() do pathlib
+    def analisar(self):
+        """
+        Analisa o arquivo, coletando informações como nome, tamanho e extensão.
 
-#     def list_contents(self, depth: int = 10) -> List[Union[FilePathModel, 'FolderPathModel']]:
-#         """Lista o conteúdo da pasta com profundidade opcional."""
-#         if not self.is_path_folder():
-#             self.logger.warning(
-#                 f"Tentativa de listar conteúdo de {self.path} que não é uma pasta."
-#             )
-#             return []
+        Retorna:
+        dict: Estrutura padronizada com os dados do arquivo, ou uma mensagem de erro.
+        """
+        try:
+            dados = {
+                "tipo": "arquivo",
+                "tamanho": self._caminho.stat().st_size,
+                "nome": self._caminho.name,
+                "extensao": self._caminho.suffix,
+            }
+            return EstruturaResposta.gerar_resposta(self._caminho, sucesso=True, dados=dados)
+        except (OSError, IOError) as e:
+            return EstruturaResposta.gerar_resposta(
+                self._caminho, sucesso=False, mensagem=f"Erro ao acessar arquivo: {e}"
+            )
 
-#         conteudo_identificado = []
-#         try:
-#             for item in self.path.iterdir():  # Usando iterdir() do pathlib
-#                 if item.is_file():
-#                     conteudo_identificado.append(
-#                         FilePathModel(str(item))
-#                     )  # Converter para string
-#                 elif item.is_dir() and depth != 0:
-#                     folder_model = FolderPathModel(str(item))  # Converter para string
-#                     conteudo_identificado.append(folder_model)
-#                     conteudo_identificado.extend(folder_model.list_contents(depth - 1))
-#         except FileNotFoundError:
-#             self.logger.error(f"Arquivo ou pasta não encontrado: {self.path}")
-#         except PermissionError:
-#             self.logger.error(f"Erro de permissão ao acessar {self.path}")
-#         except OSError as e:
-#             self.logger.error(f"Erro ao listar conteúdo de {self.path}: {e.strerror}")
 
-#         self.contents = conteudo_identificado  # Armazena o conteúdo na instância
-#         return conteudo_identificado
+class AnalisadorDePastas(CaminhoBase):
+    """
+    Classe para análise de pastas. Herda de `CaminhoBase`.
+
+    Métodos:
+    analisar(): Realiza a análise de uma pasta, contando arquivos e subpastas.
+    """
+
+    def analisar(self):
+        """
+        Analisa a pasta, contando o número de arquivos e subpastas.
+
+        Retorna:
+        dict: Estrutura padronizada com a quantidade de arquivos e pastas, ou uma mensagem de erro.
+        """
+        try:
+            total_arquivos = sum(bool(item.is_file()) for item in self._caminho.iterdir())
+            total_pastas = sum(bool(item.is_dir()) for item in self._caminho.iterdir())
+            dados = {
+                "tipo": "pasta",
+                "total_arquivos": total_arquivos,
+                "total_pastas": total_pastas,
+            }
+            return EstruturaResposta.gerar_resposta(self._caminho, sucesso=True, dados=dados)
+        except OSError as e:
+            return EstruturaResposta.gerar_resposta(
+                self._caminho, sucesso=False, mensagem=f"Erro ao acessar pasta: {e}"
+            )
+
+
+class AnalisadorDeCaminhos:
+    """
+    Classe principal para analisar caminhos de arquivos ou pastas e gerar respostas padronizadas.
+
+    Pode receber uma lista de strings ou uma única string
+    representando os caminhos a serem analisados.
+
+    Métodos:
+    __init__(caminhos): Inicializa a classe com os caminhos fornecidos.
+    analisar(): Analisa todos os caminhos fornecidos, identificando se são arquivos ou pastas.
+    procurar_arquivos(pasta=None, extensao=None): Procura arquivos em uma pasta,
+    opcionalmente filtrando por extensão.
+    """
+
+    def __init__(self, paths):
+        """
+        Inicializa a classe com os caminhos fornecidos.
+
+        Parâmetros:
+        paths (list or str): Lista de caminhos ou um único caminho a ser analisado.
+        """
+        self.caminhos = paths if isinstance(paths, list) else [paths]
+
+    def analisar(self):
+        """
+        Analisa cada caminho na lista, verificando se é um arquivo ou uma pasta,
+        e retorna um JSON com os resultados.
+
+        Retorna:
+        str: Resultado da análise de todos os caminhos fornecidos no formato JSON.
+        """
+        resultados = []
+        for caminho in self.caminhos:
+            path = Path(caminho)
+            try:
+                if path.is_file():
+                    analisador_arquivo = AnalisadorDeArquivos(path)
+                    resultados.append(analisador_arquivo.analisar())
+                elif path.is_dir():
+                    analisador_pasta = AnalisadorDePastas(path)
+                    resultados.append(analisador_pasta.analisar())
+                else:
+                    raise ValueError(f"Caminho {caminho} não é um arquivo nem uma pasta")
+            except ValueError as e:
+                resultados.append(
+                    EstruturaResposta.gerar_resposta(caminho, sucesso=False, mensagem=str(e))
+                )
+        return json.dumps(resultados, indent=4, ensure_ascii=False)
+
+    def procurar_arquivos(self, pasta=None, extensao=None):
+        """
+        Procura arquivos dentro de uma pasta. Pode filtrar por extensão.
+
+        Parâmetros:
+        pasta (str, opcional): Caminho da pasta onde procurar os arquivos.
+        Se não fornecido, utiliza o primeiro caminho fornecido na inicialização.
+        extensao (str, opcional): Extensão dos arquivos a serem buscados
+        (exemplo: ".txt"). Se não fornecido, busca todos os arquivos.
+
+        Retorna:
+        str: Resultado da busca por arquivos no formato JSON.
+        """
+        pasta = pasta or self.caminhos[0]
+        path = Path(pasta)
+
+        if not path.is_dir():
+            return json.dumps(
+                EstruturaResposta.gerar_resposta(
+                    pasta, sucesso=False, mensagem="A pasta especificada não existe"
+                ),
+                indent=4,
+                ensure_ascii=False,
+            )
+
+        arquivos = [
+            {
+                "nome": arquivo.name,
+                "tamanho": arquivo.stat().st_size,
+                "extensao": arquivo.suffix,
+                "modificado_em": arquivo.stat().st_mtime,
+            }
+            for arquivo in path.iterdir()
+            if arquivo.is_file() and (extensao is None or arquivo.suffix == extensao)
+        ]
+
+        return json.dumps(arquivos, indent=4, ensure_ascii=False)
+
+
+# Exemplo de uso com docstrings:
+
+# Caminhos a serem analisados
+caminhos = [
+    "/home/pedro-pm-dias/Downloads/Chrome/",
+    "/home/pedro-pm-dias/Downloads/"
+]
+
+# Instancia o AnalisadorDeCaminhos com os caminhos fornecidos
+analisador = AnalisadorDeCaminhos(caminhos)
+
+# Analisando os caminhos
+resultado_analise = analisador.analisar()
+print("Resultado da Análise dos Caminhos:")
+print(resultado_analise)
+
+# Procurando por arquivos com extensão .html
+resultado_busca_html = analisador.procurar_arquivos(extensao=".html")
+print("Resultado da Busca por Arquivos .html:")
+print(resultado_busca_html)

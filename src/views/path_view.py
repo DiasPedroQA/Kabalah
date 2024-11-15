@@ -2,32 +2,34 @@
 # src/views/path_view.py
 
 
-def transformar_dados(dados, tipo):
-    """
-    Transforma os dados recebidos com base no tipo especificado.
+# def transformar_dados(dados, tipo):
+#     """
+#     Transforma os dados recebidos com base no tipo especificado.
 
-    Args:
-        dados (dict): Dados processados de um arquivo ou pasta.
-        tipo (str): O tipo de dados ("pasta" ou "arquivo").
+#     Args:
+#         dados (dict): Dados processados de um arquivo ou pasta.
+#         tipo (str): O tipo de dados ("pasta" ou "arquivo").
 
-    Returns:
-        dict: Um dicionário com a estrutura transformada e uma mensagem.
-    """
-    if tipo == "pasta":
-        return {
-            "tipo": "pasta",
-            "conteudo": dados,
-            "mensagem": f"Processamento completo para a pasta: {dados.get('caminho', 'caminho não especificado')}",
-        }
+#     Returns:
+#         dict: Um dicionário com a estrutura transformada e uma mensagem.
+#     """
+#     if tipo == "pasta":
+#         return {
+#             "tipo": "pasta",
+#             "conteudo": dados,
+#             "mensagem": f"Processamento completo para a pasta: {"
+#                         f"dados.get('caminho', 'caminho não especificado')}",
+#         }
 
-    if tipo == "arquivo":
-        return {
-            "tipo": "arquivo",
-            "conteudo": dados,
-            "mensagem": f"Conteúdo do arquivo {dados.get('caminho', 'caminho não especificado')} processado com sucesso",
-        }
+#     if tipo == "arquivo":
+#         return {
+#             "tipo": "arquivo",
+#             "conteudo": dados,
+#             "mensagem": f"Conteúdo do arquivo {dados.get('caminho',"
+#                         f" 'caminho não especificado')} processado com sucesso",
+#         }
 
-    return {"erro": "Tipo desconhecido"}
+#     return {"erro": "Tipo desconhecido"}
 
 
 # class CustomLogger:

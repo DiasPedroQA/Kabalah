@@ -1,50 +1,42 @@
 # pylint: disable=C
 # src/controllers/path_controller.py
 
-from flask import Flask, jsonify, request  # Importar request corretamente
-app = Flask(__name__)
+# from flask import Flask, jsonify, request
+# from services.path_service import processar_caminhos
+
+# app = Flask(__name__)
 
 
-@app.route('/processar', methods=['POST'])
-def processar():
-    dados = request.get_json()
-    caminhos = dados.get("caminhos", [])
+# @app.route('/processar', methods=['POST'])
+# def processar():
+#     dados = request.get_json()
+#     caminhos = dados.get("caminhos", [])
 
-    resultados = []
-    for caminho in caminhos:
-        if caminho.endswith('/'):
-            # Simulando a lógica para um caminho de pasta
-            resultados.append({"tipo": "pasta", "conteudo": {"caminho": caminho}})
-        elif caminho.endswith('.html') or caminho.endswith('.txt'):
-            # Simulando a lógica para um caminho de arquivo
-            resultados.append({"tipo": "arquivo", "conteudo": {"caminho": caminho}})
-        else:
-            # Caso de erro para caminho inválido
-            resultados.append({"erro": f"Caminho inválido ou inexistente: {caminho}"})
-
-    return jsonify(resultados)
+#     # Chama o serviço de processamento de caminhos
+#     resultados = processar_caminhos(caminhos)
+#     return jsonify(resultados)
 
 
-def inicializar_controller():
-    app.run(debug=True)
+# def inicializar_controller():
+#     app.run(debug=True)
 
 
-# Para rodar a aplicação diretamente
-if __name__ == "__main__":
-    inicializar_controller()
+# if __name__ == "__main__":
+#     inicializar_controller()
 
 
 # class GerenciadorCaminhos:
 #     """
 #     Classe para gerenciar a filtragem de arquivos HTML e manipulação de caminhos.
 
-#     Esta classe permite inicializar um caminho como arquivo ou pasta, identificar o tipo de caminho,
-#     e filtrar arquivos com extensão .html. Os arquivos HTML filtrados são armazenados para uso
-#     posterior.
+#     Esta classe permite inicializar um caminho como arquivo ou pasta,
+#     identificar o tipo de caminho, e filtrar arquivos com extensão .html.
+#     Os arquivos HTML filtrados são armazenados para uso posterior.
 
 #     Atributos:
 #         caminho (Path): Caminho do arquivo ou pasta a ser gerenciado.
-#         logger (CustomLogger): Logger personalizado para registrar mensagens do GerenciadorCaminhos.
+#         logger (CustomLogger): Logger personalizado para registrar
+#         mensagens do GerenciadorCaminhos.
 #         model (Union[FilePathModel, FolderPathModel]): Modelo de caminho inicializado.
 #         arquivos_html (List[FilePathModel]): Lista de arquivos HTML filtrados.
 #     """

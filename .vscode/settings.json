@@ -66,5 +66,9 @@
     "explorer.sortOrder": "type",  // Ordena arquivos e pastas por tipo
     "workbench.colorTheme": "Default Dark+",  // Tema escuro padrão
     "workbench.startupEditor": "newUntitledFile",  // Abre um novo arquivo vazio ao iniciar o VS Code
-    "window.zoomLevel": 1  // Nível de zoom da interface
+    "window.zoomLevel": 1,
+    "docwriter.progress.trackFunctions": true,
+    "docwriter.progress.trackMethods": true,
+    "docwriter.progress.trackClasses": true,
+    "docwriter.progress.trackTypes": true // Nível de zoom da interface
 }

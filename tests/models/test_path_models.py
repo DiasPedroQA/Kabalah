@@ -1,20 +1,51 @@
 # pylint: disable=C
 # tests/test_path_models.py
 
-from models.path_models import processar_pasta, processar_arquivo
+import json
+import pytest
+from src.models.path_models import AnalisadorDeCaminhos
 
 
-def test_processar_pasta():
-    caminho = "/home/pedro-pm-dias/Downloads/folder1"
-    expected_result = {"caminho": caminho, "itens": ["file1.txt", "file2.txt", "subfolder"]}
+@pytest.fixture
+def arquivo_temporario(tmp_path):
+    caminho_arquivo = tmp_path / "arquivo_teste.txt"
+    caminho_arquivo.write_text("conteúdo de teste")
+    return caminho_arquivo
 
-    result = processar_pasta(caminho)
-    assert result == expected_result
+
+@pytest.fixture
+def pasta_temporaria(tmp_path):
+    pasta = tmp_path / "pasta_teste"
+    pasta.mkdir()
+    (pasta / "arquivo1.txt").write_text("arquivo na pasta")
+    (pasta / "arquivo2.txt").write_text("outro arquivo na pasta")
+    (pasta / "subpasta").mkdir()
+    return pasta
 
 
-def test_processar_arquivo():
-    caminho = "/home/pedro-pm-dias/Downloads/file1.txt"
-    expected_result = {"caminho": caminho, "conteudo": "Conteúdo do arquivo de exemplo"}
+def test_analisar_arquivo(arquivo_temporario):
+    analisador = AnalisadorDeCaminhos(str(arquivo_temporario))
+    resultado = json.loads(analisador.analisar())
+    assert len(resultado) == 1
+    assert resultado[0]["resultado"] == "sucesso"
+    assert resultado[0]["dados"]["tipo"] == "arquivo"
+    assert resultado[0]["dados"]["nome"] == "arquivo_teste.txt"
+    assert resultado[0]["dados"]["extensao"] == ".txt"
 
-    result = processar_arquivo(caminho)
-    assert result == expected_result
+
+def test_analisar_pasta(pasta_temporaria):
+    analisador = AnalisadorDeCaminhos(str(pasta_temporaria))
+    resultado = json.loads(analisador.analisar())
+    assert len(resultado) == 1
+    assert resultado[0]["resultado"] == "sucesso"
+    assert resultado[0]["dados"]["tipo"] == "pasta"
+    assert resultado[0]["dados"]["total_arquivos"] == 2
+    assert resultado[0]["dados"]["total_pastas"] == 1
+
+
+def test_caminho_invalido():
+    analisador = AnalisadorDeCaminhos("/caminho/invalido")
+    resultado = json.loads(analisador.analisar())
+    assert len(resultado) == 1
+    assert resultado[0]["resultado"] == "erro"
+    assert "Caminho não existe" in resultado[0]["mensagem"]
