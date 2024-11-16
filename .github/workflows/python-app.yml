@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.10]  # Especifica a versão do Python a ser utilizada, pode ser expandido para suportar múltiplas versões
+        python-version: [3.9]  # Especifica a versão do Python a ser utilizada, pode ser expandido para suportar múltiplas versões
 
     steps:
       - name: Checkout do código
