@@ -29,9 +29,8 @@
 #     tipo = "arquivo"
 
 #     expected_result = {
-#         "tipo": "arquivo",
-#         "conteudo": dados,
-#         "mensagem": "Conteúdo do arquivo /home/pedro-pm-dias/Downloads/file1.txt processado com sucesso",
+#         "tipo": "arquivo", "conteudo": dados,
+# "mensagem": "Conteúdo do arquivo /home/pedro-pm-dias/Downloads/file1.txt processado com sucesso",
 #     }
 
 #     result = transformar_dados(dados, tipo)
