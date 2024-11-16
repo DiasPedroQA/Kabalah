@@ -26,43 +26,13 @@
 
 
 # class GerenciadorCaminhos:
-#     """
-#     Classe para gerenciar a filtragem de arquivos HTML e manipulação de caminhos.
-
-#     Esta classe permite inicializar um caminho como arquivo ou pasta,
-#     identificar o tipo de caminho, e filtrar arquivos com extensão .html.
-#     Os arquivos HTML filtrados são armazenados para uso posterior.
-
-#     Atributos:
-#         caminho (Path): Caminho do arquivo ou pasta a ser gerenciado.
-#         logger (CustomLogger): Logger personalizado para registrar
-#         mensagens do GerenciadorCaminhos.
-#         model (Union[FilePathModel, FolderPathModel]): Modelo de caminho inicializado.
-#         arquivos_html (List[FilePathModel]): Lista de arquivos HTML filtrados.
-#     """
-
 #     def __init__(self, caminho: str):
-#         """
-#         Inicializa o GerenciadorCaminhos com o caminho especificado.
-
-#         Args:
-#             caminho (str): O caminho do arquivo ou pasta a ser gerenciado.
-#         """
 #         self.caminho = pathlib.Path(caminho)
 #         self.logger = CustomLogger(__name__)
 #         self.model = self._inicializar_modelo()
 #         self.arquivos_html: List[FilePathModel] = []
 
 #     def _inicializar_modelo(self) -> Union[FilePathModel, FolderPathModel]:
-#         """
-#         Inicializa o modelo de arquivo ou pasta com base no caminho especificado.
-
-#         Returns:
-#             Union[FilePathModel, FolderPathModel]: Instância do modelo de caminho.
-
-#         Raises:
-#             ValueError: Se o caminho não for um arquivo nem uma pasta.
-#         """
 #         if self.caminho.is_dir():
 #             self.logger.info(f"Inicializado como pasta: {self.caminho}")
 #             return FolderPathModel(str(self.caminho))
@@ -75,13 +45,11 @@
 #         raise ValueError(error_message)
 
 #     def tipo_caminho(self) -> str:
-#         """
 #         Retorna o tipo do caminho inicializado (arquivo ou pasta).
 
 #         Returns:
 #             str: "Pasta" se for uma pasta, "Arquivo" se for um arquivo,
 #             ou "Inválido" se não for nenhum.
-#         """
 #         if isinstance(self.model, FolderPathModel):
 #             return "Pasta"
 #         elif isinstance(self.model, FilePathModel):
@@ -89,12 +57,6 @@
 #         return "Inválido"
 
 #     def filtrar_arquivos_html(self) -> List[FilePathModel]:
-#         """
-#         Filtra e retorna uma lista de arquivos `.html` no caminho especificado.
-
-#         Returns:
-#             List[FilePathModel]: Lista de objetos `FilePathModel` representando arquivos `.html`.
-#         """
 #         if isinstance(self.model, FolderPathModel):
 #             self.arquivos_html = [
 #                 item
@@ -117,72 +79,24 @@
 #         return []
 
 #     def listar_arquivos_html(self) -> List[FilePathModel]:
-#         """
-#         Retorna a lista de arquivos HTML filtrados.
-
-#         Returns:
-#             List[FilePathModel]: Lista de objetos `FilePathModel`
-#             representando arquivos `.html` filtrados.
-#         """
 #         return self.arquivos_html
 
 
 # class HTMLParser:
-#     """
-#     Classe para parseamento de arquivos HTML e geração de PDFs
-#     com listas de links organizadas por título.
-
-#     Esta classe permite carregar e processar arquivos HTML para
-#     extrair listas de links agrupadas
-#     por títulos. Também fornece um método para gerar um arquivo
-#     PDF formatado com as listas extraídas.
-
-#     Atributos:
-#         file_path (Path): Caminho do arquivo HTML a ser processado.
-#         logger (CustomLogger): Logger personalizado para registrar mensagens do HTMLParser.
-#     """
-
 #     def __init__(self, file_path: str):
-#         """
-#         Inicializa o parser com o caminho do arquivo HTML.
-
-#         Args:
-#             file_path (str): Caminho do arquivo HTML.
-#         """
 #         self.file_path = pathlib.Path(file_path)
 #         self.logger = CustomLogger(__name__)
 
 #     def process_html_file(self) -> Dict[str, Any]:
-#         """
-#         Processa o arquivo HTML e extrai listas de links agrupadas por título.
-
-#         Returns:
-#             Dict[str, Any]: Dicionário com listas de links agrupadas por títulos numerados.
-#         """
 #         soup = self._load_html()
 #         return self._extract_lists(soup)
 
 #     def _load_html(self) -> BeautifulSoup:
-#         """
-#         Carrega o conteúdo HTML do arquivo especificado e retorna um objeto BeautifulSoup.
-
-#         Returns:
-#             BeautifulSoup: Objeto BeautifulSoup do conteúdo HTML.
-#         """
 #         with self.file_path.open('r', encoding='utf-8') as file:
 #             content = file.read()
 #         return BeautifulSoup(content, 'html.parser')
 
 #     def _extract_lists(self, soup: BeautifulSoup) -> Dict[str, Any]:
-#         """
-#         Extrai listas de links e títulos do conteúdo HTML, incluindo listas aninhadas.
-
-#         Args:
-#             soup (BeautifulSoup): Objeto BeautifulSoup do conteúdo HTML.
-
-#         Returns:
-#             Dict[str, Any]: Dicionário com listas agrupadas por títulos numerados.
-#         """
 #         lists = {}
 #         list_count = 1
 
@@ -225,12 +139,6 @@
 #         return lists
 
 #     def create_pdf(self, json_data: Dict[str, Any]) -> None:
-#         """
-#         Gera um PDF formatado com as listas do JSON e o salva na mesma pasta do arquivo HTML.
-
-#         Args:
-#             json_data (Dict[str, Any]): JSON com listas de links agrupadas por títulos.
-#         """
 #         pdf_file_path = self.file_path.with_suffix('.pdf')
 #         doc = SimpleDocTemplate(str(pdf_file_path), pagesize=A4)
 #         story = []
