@@ -1,12 +1,12 @@
 # src/views/visual_caminho.py
 # pylint: disable=C
 
+import json
 from typing import List, Optional
 from controllers.controle_caminhos import ControladorDeCaminhos
 
 
 def validar_entradas(caminhos: List[str], extensoes: Optional[List[str]]):
-    """Valida as entradas de caminhos e extensões."""
     if not isinstance(caminhos, list):
         return "'caminhos' deve ser uma lista de strings representando caminhos."  # noqa
 
@@ -34,9 +34,6 @@ def filtrar_por_extensao(
 
 
 def exibir_resultados(caminhos: List[str], extensoes: Optional[List[str]] = None):  # noqa
-    """Exibe os resultados após processar os caminhos."""
-    import json
-
     # Validação das entradas
     erro_validacao = validar_entradas(caminhos, extensoes)
     if erro_validacao:
