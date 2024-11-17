@@ -49,7 +49,7 @@ class TestVisualCaminho(unittest.TestCase):
         self.assertEqual(len(resultado), 2)
         self.assertTrue(all(arq["extensao"] in [".txt", ".py"] for arq in resultado))
 
-    @patch('src.controllers.controle_caminhos.ControladorDeCaminhos')
+    @patch('controllers.controle_caminhos.ControladorDeCaminhos')
     @patch('builtins.print')
     def test_exibir_resultados_erro_validacao(self, mock_print, mock_controlador):
         exibir_resultados("caminho_invalido")
@@ -58,7 +58,7 @@ class TestVisualCaminho(unittest.TestCase):
         )
         mock_controlador.assert_not_called()
 
-    @patch('src.controllers.controle_caminhos.ControladorDeCaminhos')
+    @patch('controllers.controle_caminhos.ControladorDeCaminhos')
     @patch('builtins.print')
     def test_exibir_resultados_sucesso(self, mock_print, mock_controlador):
         mock_instance = mock_controlador.return_value
@@ -70,7 +70,7 @@ class TestVisualCaminho(unittest.TestCase):
         mock_controlador.assert_called_once()
         self.assertTrue(mock_print.called)
 
-    @patch('src.controllers.controle_caminhos.ControladorDeCaminhos')
+    @patch('controllers.controle_caminhos.ControladorDeCaminhos')
     @patch('builtins.print')
     def test_exibir_resultados_erro_processamento(self, mock_print, mock_controlador):
         mock_instance = mock_controlador.return_value

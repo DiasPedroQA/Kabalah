@@ -3,7 +3,8 @@
 import unittest
 import json
 from unittest.mock import patch, Mock
-from src.controllers.controle_caminhos import ControladorDeCaminhos
+from controllers.controle_caminhos import ControladorDeCaminhos
+
 # from src.models.modelo_caminhos import Caminho, Arquivo, Pasta
 
 
