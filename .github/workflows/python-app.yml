@@ -9,16 +9,15 @@ on:
       - "main"
 
 permissions:
-  contents: read  # Permissão necessária para o checkout do repositório
+  contents: read
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.9] # Teste em uma versão específica do Python
-        # python-version: [3.8, 3.9, 3.10]  # Teste em múltiplas versões do Python
-        os: [ubuntu-latest, macos-latest, windows-latest]  # Teste em múltiplos sistemas operacionais
+        python-version: [3.8, 3.9, 3.10]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - name: Checkout do código
@@ -36,16 +35,15 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Verificar dependências
-        run: pip check  # Verifica se as dependências são consistentes
+        run: pip check
 
       - name: Lint com flake8
         run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          flake8 . --max-complexity=10 --max-line-length=127 --select=E9,F63,F7,F82 --statistics
 
       - name: Testar com pytest e gerar relatórios de cobertura
         run: |
-          pytest --cov=src --cov-report=html --cov-report=xml --cov-fail-under=80 tests -vv  # Definindo cobertura mínima de 80%
+          pytest --cov=src --cov-report=html --cov-report=xml --cov-fail-under=80 tests -vv
 
       - name: Enviar relatório de cobertura
         uses: actions/upload-artifact@v3
@@ -53,7 +51,7 @@ jobs:
           name: coverage-report
           path: htmlcov
 
-      # - name: Publicar cobertura no Codecov
-      #   uses: codecov/codecov-action@v3
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Publicar cobertura no Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

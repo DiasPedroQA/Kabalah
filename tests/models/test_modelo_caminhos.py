@@ -9,6 +9,10 @@ from unittest.mock import patch, MagicMock
 import pytest
 from models.modelo_caminhos import Caminho, Arquivo, Pasta
 
+CAMINHO_TESTE = "/home/pedro-pm-dias/Downloads/Chrome"
+ARQUIVO_TESTE = "/home/pedro-pm-dias/Downloads/"
+PASTA_TESTE = "/home/pedro-pm-dias/Downloads/"
+
 
 class TestModeloCaminhos:
     """
@@ -26,20 +30,20 @@ class TestModeloCaminhos:
         """
         Configuração antes de cada teste.
         """
-        self.caminho_teste = Path("/teste/caminho")
+        self.caminho_teste = Path(CAMINHO_TESTE)
 
     def test_inicializacao_caminho_com_string(self):
         """
         Testa se a classe Caminho é inicializada corretamente com uma string.
         """
-        caminho = Caminho("/teste/caminho")
+        caminho = Caminho(CAMINHO_TESTE)
         assert isinstance(caminho.path, Path)
 
     def test_inicializacao_caminho_com_path(self):
         """
         Testa se a classe Caminho é inicializada corretamente com um objeto Path.
         """
-        obj_path = Path("/teste/caminho")
+        obj_path = Path(CAMINHO_TESTE)
         caminho = Caminho(obj_path)
         assert caminho.path == obj_path
 
@@ -57,7 +61,7 @@ class TestModeloCaminhos:
         Testa se a extensão do arquivo é recuperada corretamente.
         """
         with patch('pathlib.Path.is_file', return_value=True):
-            arquivo = Arquivo("/teste/arquivo.html")
+            arquivo = Arquivo(ARQUIVO_TESTE)
             assert arquivo.extensao == ".html"
 
     @patch('pathlib.Path.stat')
@@ -68,7 +72,7 @@ class TestModeloCaminhos:
         """
         mock_e_arquivo.return_value = True
         mock_stat.return_value = MagicMock(st_size=2048)
-        arquivo = Arquivo("/teste/arquivo.html")
+        arquivo = Arquivo(ARQUIVO_TESTE)
         assert arquivo.tamanho_formatado() == "2.00 kB"
 
     def test_inicializacao_arquivo_com_caminho_invalido(self):
@@ -103,7 +107,7 @@ class TestModeloCaminhos:
         ]
         mock_iterdir.return_value = mock_arquivos
 
-        pasta = Pasta("/teste/pasta")
+        pasta = Pasta(PASTA_TESTE)
         arquivos = pasta.listar_arquivos(extensoes=['.html', '.py'])
         assert len(arquivos) == 2
 
@@ -116,7 +120,7 @@ class TestModeloCaminhos:
         mock_e_pasta.return_value = True
         mock_iterdir.side_effect = PermissionError()
 
-        pasta = Pasta("/teste/pasta")
+        pasta = Pasta(PASTA_TESTE)
         subitens = pasta.subitens
         assert len(subitens) == 1
         assert "Inacessível" in str(subitens[0].path)
@@ -126,7 +130,7 @@ class TestModeloCaminhos:
         Testa se a conversão de um Caminho para dicionário funciona corretamente.
         """
         with patch('pathlib.Path.exists', return_value=True):
-            caminho = Caminho("/teste/caminho")
+            caminho = Caminho(CAMINHO_TESTE)
             resultado = caminho.para_dict()
 
             assert isinstance(resultado, dict)

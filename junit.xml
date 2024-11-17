@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="23" time="0.432" timestamp="2024-11-17T20:32:56.250507-03:00" hostname="ubuntu24-B550M-AORUS-ELITE"><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="test_inicializa_cria_lista_de_caminhos" file="tests/controllers/test_controle_caminhos.py" line="28" time="0.004"><failure message="AssertionError: Expected 'Caminho' to have been called.">self = &lt;test_controle_caminhos.TestControladorDeCaminhos object at 0x7b978cd65940&gt;
+mock_caminho = &lt;MagicMock name='Caminho' id='135890845405632'&gt;
+setup_controller = (&lt;controllers.controle_caminhos.ControladorDeCaminhos object at 0x7b978cbaf0b0&gt;, ['/teste/caminho1', '/teste/caminho2'])
+
+    @patch('models.modelo_caminhos.Caminho')
+    def test_inicializa_cria_lista_de_caminhos(self, mock_caminho, setup_controller):
+        """
+        Testa se o `ControladorDeCaminhos` inicializa com uma lista de caminhos.
+        """
+        _, paths = setup_controller
+        controlador = ControladorDeCaminhos(paths)
+        assert len(controlador.caminhos) == 2
+&gt;       mock_caminho.assert_called()
+
+tests/controllers/test_controle_caminhos.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;MagicMock name='Caminho' id='135890845405632'&gt;
+
+    def assert_called(self):
+        """assert that the mock was called at least once
+        """
+        if self.call_count == 0:
+            msg = ("Expected '%s' to have been called." %
+                   (self._mock_name or 'mock'))
+&gt;           raise AssertionError(msg)
+E           AssertionError: Expected 'Caminho' to have been called.
+
+/usr/lib/python3.12/unittest/mock.py:913: AssertionError</failure></testcase><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="test_inicializa_com_filtro_de_extensoes" file="tests/controllers/test_controle_caminhos.py" line="38" time="0.001"><failure message="TypeError: TestControladorDeCaminhos.test_inicializa_com_filtro_de_extensoes() takes 1 positional argument but 2 were given">args = (&lt;test_controle_caminhos.TestControladorDeCaminhos object at 0x7b978d91bcb0&gt;,), keywargs = {}
+newargs = (&lt;test_controle_caminhos.TestControladorDeCaminhos object at 0x7b978d91bcb0&gt;, &lt;MagicMock name='Caminho' id='135890829572480'&gt;)
+newkeywargs = {}
+
+    @wraps(func)
+    def patched(*args, **keywargs):
+        with self.decoration_helper(patched,
+                                    args,
+                                    keywargs) as (newargs, newkeywargs):
+&gt;           return func(*newargs, **newkeywargs)
+E           TypeError: TestControladorDeCaminhos.test_inicializa_com_filtro_de_extensoes() takes 1 positional argument but 2 were given
+
+/usr/lib/python3.12/unittest/mock.py:1390: TypeError</failure></testcase><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="test_processa_arquivo_valido" file="tests/controllers/test_controle_caminhos.py" line="47" time="0.002"><failure message="AssertionError: assert 'erro' == 'arquivo'&#10;  &#10;  - arquivo&#10;  + erro">self = &lt;test_controle_caminhos.TestControladorDeCaminhos object at 0x7b978cbac560&gt;
+mock_caminho = &lt;MagicMock name='Caminho' id='135890829571664'&gt;
+mock_arquivo = &lt;MagicMock name='Arquivo' id='135890830313568'&gt;
+setup_controller = (&lt;controllers.controle_caminhos.ControladorDeCaminhos object at 0x7b978c9ff710&gt;, ['/teste/caminho1', '/teste/caminho2'])
+
+    @patch('models.modelo_caminhos.Arquivo')
+    @patch('models.modelo_caminhos.Caminho')
+    def test_processa_arquivo_valido(self, mock_caminho, mock_arquivo, setup_controller):
+        """
+        Testa o processamento de um arquivo válido e retorna seu conteúdo como dicionário.
+        """
+        controlador, _ = setup_controller
+        mock_caminho.existe = True
+        mock_caminho.tipo = "arquivo"
+        mock_caminho.path = "/teste/arquivo.txt"
+        mock_arquivo.return_value.para_dict.return_value = {"nome": "arquivo.txt"}
+    
+        resultado = controlador.processar_arquivo(mock_caminho)
+    
+&gt;       assert resultado["status"] == "arquivo"
+E       AssertionError: assert 'erro' == 'arquivo'
+E         
+E         - arquivo
+E         + erro
+
+tests/controllers/test_controle_caminhos.py:62: AssertionError</failure></testcase><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="test_processa_pasta_valida" file="tests/controllers/test_controle_caminhos.py" line="64" time="0.002"><failure message="AssertionError: assert 'erro' == 'pasta'&#10;  &#10;  - pasta&#10;  + erro">self = &lt;test_controle_caminhos.TestControladorDeCaminhos object at 0x7b978cbac6e0&gt;
+mock_caminho = &lt;MagicMock name='Caminho' id='135890830327152'&gt;
+mock_pasta = &lt;MagicMock name='Pasta' id='135890850273552'&gt;
+setup_controller = (&lt;controllers.controle_caminhos.ControladorDeCaminhos object at 0x7b978cab7e60&gt;, ['/teste/caminho1', '/teste/caminho2'])
+
+    @patch('models.modelo_caminhos.Pasta')
+    @patch('models.modelo_caminhos.Caminho')
+    def test_processa_pasta_valida(self, mock_caminho, mock_pasta, setup_controller):
+        """
+        Testa o processamento de uma pasta válida e retorna seu conteúdo como dicionário.
+        """
+        controlador, _ = setup_controller
+        mock_caminho.existe = True
+        mock_caminho.tipo = "pasta"
+        mock_caminho.path = "/teste/pasta"
+        mock_pasta.return_value.listar_arquivos.return_value = []
+        mock_pasta.return_value.subitens = []
+    
+        resultado = controlador.processar_pasta(mock_caminho)
+    
+&gt;       assert resultado["status"] == "pasta"
+E       AssertionError: assert 'erro' == 'pasta'
+E         
+E         - pasta
+E         + erro
+
+tests/controllers/test_controle_caminhos.py:80: AssertionError</failure></testcase><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="test_processa_caminho_invalido" file="tests/controllers/test_controle_caminhos.py" line="83" time="0.001" /><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="testbusca_recursiva_pasta_vazia" file="tests/controllers/test_controle_caminhos.py" line="97" time="0.001"><failure message="assert 0 == 1&#10; +  where 0 = len([])">self = &lt;test_controle_caminhos.TestControladorDeCaminhos object at 0x7b978cbac9e0&gt;
+mock_caminho = &lt;MagicMock name='Caminho' id='135890830102544'&gt;
+setup_controller = (&lt;controllers.controle_caminhos.ControladorDeCaminhos object at 0x7b978ca81070&gt;, ['/teste/caminho1', '/teste/caminho2'])
+
+    @patch('models.modelo_caminhos.Caminho')
+    def testbusca_recursiva_pasta_vazia(self, mock_caminho, setup_controller):
+        """
+        Testa a funcionalidade de busca recursiva para uma pasta vazia.
+        """
+        controlador, _ = setup_controller
+        mock_caminho.tipo = "pasta"
+        mock_caminho.subitens = []
+    
+        resultado = controlador.buscar_recursivamente(mock_caminho)
+    
+        assert isinstance(resultado, list)
+&gt;       assert len(resultado) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/controllers/test_controle_caminhos.py:110: AssertionError</failure></testcase><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="testbusca_recursiva_arquivo" file="tests/controllers/test_controle_caminhos.py" line="111" time="0.001"><failure message="ValueError: O caminho MagicMock/Caminho.path/135890830103360 não é um arquivo.">self = &lt;test_controle_caminhos.TestControladorDeCaminhos object at 0x7b978cbacb60&gt;
+mock_caminho = &lt;MagicMock name='Caminho' id='135890830101248'&gt;
+setup_controller = (&lt;controllers.controle_caminhos.ControladorDeCaminhos object at 0x7b978ca80a40&gt;, ['/teste/caminho1', '/teste/caminho2'])
+
+    @patch('models.modelo_caminhos.Caminho')
+    def testbusca_recursiva_arquivo(self, mock_caminho, setup_controller):
+        """
+        Testa a busca recursiva para um arquivo.
+        """
+        controlador, _ = setup_controller
+        mock_caminho.tipo = "arquivo"
+    
+&gt;       resultado = controlador.buscar_recursivamente(mock_caminho)
+
+tests/controllers/test_controle_caminhos.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/controllers/controle_caminhos.py:84: in buscar_recursivamente
+    encontrados.append(Arquivo(caminho.path))  # Adiciona o arquivo encontrado  # noqa
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;models.modelo_caminhos.Arquivo object at 0x7b978cdcae40&gt;
+caminho = &lt;MagicMock name='Caminho.path' id='135890830103360'&gt;
+
+    def __init__(self, caminho: Union[str, Path]):
+        """
+        Inicializa um objeto para representar um arquivo. Levanta um erro
+        se o caminho não for um arquivo.
+    
+        :param caminho: Caminho do arquivo.
+        :raises ValueError: Se o caminho não for um arquivo.
+        """
+        super().__init__(caminho)
+        if not self.is_arquivo():
+&gt;           raise ValueError(f"O caminho {self.path} não é um arquivo.")
+E           ValueError: O caminho MagicMock/Caminho.path/135890830103360 não é um arquivo.
+
+src/models/modelo_caminhos.py:105: ValueError</failure></testcase><testcase classname="tests.controllers.test_controle_caminhos.TestControladorDeCaminhos" name="test_gera_relatorio_json_formato" file="tests/controllers/test_controle_caminhos.py" line="124" time="0.001" /><testcase classname="tests.test_main.TestMain" name="test_obter_caminhos_e_extensoes_retorna_tupla" file="tests/test_main.py" line="15" time="0.000" /><testcase classname="tests.test_main.TestMain" name="test_obter_caminhos_e_extensoes_conteudo" file="tests/test_main.py" line="25" time="0.000" /><testcase classname="tests.test_main.TestMain" name="test_main_adiciona_path_se_necessario" file="tests/test_main.py" line="34" time="0.002" /><testcase classname="tests.test_main.TestMain" name="test_main_nao_adiciona_path_se_ja_existe" file="tests/test_main.py" line="50" time="0.007" /><testcase classname="tests.test_main.TestMain" name="test_main_chama_exibir_resultados_com_parametros_corretos" file="tests/test_main.py" line="61" time="0.001" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_validar_entradas_caminhos_invalidos" file="tests/views/test_visual_caminho.py" line="16" time="0.001" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_validar_entradas_caminhos_tipos_invalidos" file="tests/views/test_visual_caminho.py" line="24" time="0.000" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_validar_entradas_extensoes_invalidas" file="tests/views/test_visual_caminho.py" line="32" time="0.000" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_validar_entradas_extensoes_tipos_invalidos" file="tests/views/test_visual_caminho.py" line="40" time="0.000" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_validar_entradas_validas" file="tests/views/test_visual_caminho.py" line="48" time="0.000" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_filtrar_por_extensao_sem_filtro" file="tests/views/test_visual_caminho.py" line="55" time="0.000" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_filtrar_por_extensao_com_filtro" file="tests/views/test_visual_caminho.py" line="66" time="0.000" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_exibir_resultados_erro_validacao" file="tests/views/test_visual_caminho.py" line="79" time="0.001" /><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_exibir_resultados_sucesso" file="tests/views/test_visual_caminho.py" line="91" time="0.001"><failure message="AssertionError: Expected 'ControladorDeCaminhos' to have been called once. Called 0 times.">self = &lt;test_visual_caminho.TestVisualCaminho object at 0x7b978cbaede0&gt;
+mock_print = &lt;MagicMock name='print' id='135890830520496'&gt;
+mock_controlador = &lt;MagicMock name='ControladorDeCaminhos' id='135890830524336'&gt;
+
+    @patch('controllers.controle_caminhos.ControladorDeCaminhos')
+    @patch('builtins.print')
+    def test_exibir_resultados_sucesso(self, mock_print, mock_controlador):
+        """
+        Testa se `exibir_resultados` funciona corretamente ao processar entradas válidas.
+        """
+        mock_instance = mock_controlador.return_value
+        mock_instance.processar_e_gerar_json.return_value = json.dumps(
+            [{"status": "pasta", "conteudo": [{"nome": "file.txt", "extensao": ".txt"}]}]
+        )
+    
+        exibir_resultados(["/test/path"], [".txt"])
+&gt;       mock_controlador.assert_called_once()
+
+tests/views/test_visual_caminho.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;MagicMock name='ControladorDeCaminhos' id='135890830524336'&gt;
+
+    def assert_called_once(self):
+        """assert that the mock was called only once.
+        """
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+&gt;           raise AssertionError(msg)
+E           AssertionError: Expected 'ControladorDeCaminhos' to have been called once. Called 0 times.
+
+/usr/lib/python3.12/unittest/mock.py:923: AssertionError</failure></testcase><testcase classname="tests.views.test_visual_caminho.TestVisualCaminho" name="test_exibir_resultados_erro_processamento" file="tests/views/test_visual_caminho.py" line="106" time="0.001"><failure message="AssertionError: expected call not found.&#10;Expected: print('Erro ao processar caminhos: Erro teste')&#10;  Actual: print('Erro ao processar caminhos: the JSON object must be str, bytes or bytearray, not list')">self = &lt;test_visual_caminho.TestVisualCaminho object at 0x7b978cbaeb70&gt;
+mock_print = &lt;MagicMock name='print' id='135890830513152'&gt;
+mock_controlador = &lt;MagicMock name='ControladorDeCaminhos' id='135890830137280'&gt;
+
+    @patch('controllers.controle_caminhos.ControladorDeCaminhos')
+    @patch('builtins.print')
+    def test_exibir_resultados_erro_processamento(self, mock_print, mock_controlador):
+        """
+        Testa se `exibir_resultados` lida corretamente com erros durante o processamento.
+        """
+        mock_instance = mock_controlador.return_value
+        mock_instance.processar_e_gerar_json.side_effect = ValueError("Erro teste")
+    
+        exibir_resultados(["/test/path"])
+&gt;       mock_print.assert_called_with("Erro ao processar caminhos: Erro teste")
+
+tests/views/test_visual_caminho.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;MagicMock name='print' id='135890830513152'&gt;
+args = ('Erro ao processar caminhos: Erro teste',), kwargs = {}
+expected = call('Erro ao processar caminhos: Erro teste')
+actual = call('Erro ao processar caminhos: the JSON object must be str, bytes or bytearray, not list')
+_error_message = &lt;function NonCallableMock.assert_called_with.&lt;locals&gt;._error_message at 0x7b978ca860c0&gt;
+cause = None
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\n  Actual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+&gt;           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: print('Erro ao processar caminhos: Erro teste')
+E             Actual: print('Erro ao processar caminhos: the JSON object must be str, bytes or bytearray, not list')
+
+/usr/lib/python3.12/unittest/mock.py:944: AssertionError</failure></testcase></testsuite></testsuites>
