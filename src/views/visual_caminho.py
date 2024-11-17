@@ -1,5 +1,5 @@
 # src/views/visual_caminho.py
-# pylint: disable=C, E
+# pylint: disable=C
 
 from typing import List, Optional
 from controllers.controle_caminhos import ControladorDeCaminhos
@@ -22,7 +22,9 @@ def validar_entradas(caminhos: List[str], extensoes: Optional[List[str]]):
     return None  # Caso não haja erro
 
 
-def filtrar_por_extensao(arquivos: List[dict], extensoes: Optional[List[str]]) -> List[dict]:  # noqa
+def filtrar_por_extensao(
+    arquivos: List[dict], extensoes: Optional[List[str]]
+) -> List[dict]:  # noqa
     """Filtra os arquivos por extensão, se as extensões forem fornecidas."""
     if not extensoes:
         return arquivos  # Retorna todos os arquivos se não houver filtro
@@ -33,6 +35,8 @@ def filtrar_por_extensao(arquivos: List[dict], extensoes: Optional[List[str]]) -
 
 def exibir_resultados(caminhos: List[str], extensoes: Optional[List[str]] = None):  # noqa
     """Exibe os resultados após processar os caminhos."""
+    import json
+
     # Validação das entradas
     erro_validacao = validar_entradas(caminhos, extensoes)
     if erro_validacao:
@@ -50,7 +54,9 @@ def exibir_resultados(caminhos: List[str], extensoes: Optional[List[str]] = None
         # Filtra os arquivos, se as extensões forem fornecidas
         for resultado in resultados_json:
             if resultado.get("status") == "pasta" and "conteudo" in resultado:
-                resultado["conteudo"] = filtrar_por_extensao(resultado["conteudo"], extensoes)  # noqa
+                resultado["conteudo"] = filtrar_por_extensao(
+                    resultado["conteudo"], extensoes
+                )  # noqa
 
         # Exibe os resultados de forma legível
         print("Resultados da análise:")

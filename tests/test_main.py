@@ -1,86 +1,54 @@
 # pylint: disable=C, E
 
 import unittest
-import os
-import json
-from src.main import app, DIRETORIO_ARQUIVOS  # Import the Flask app
+# from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+from src.main import obter_caminhos_e_extensoes, main
 
 
-class TestRotaProcessarArquivo(unittest.TestCase):
-    def setUp(self):
-        """
-        Configura o ambiente de teste:
-            - Inicializa o cliente de teste do Flask.
-            - Garante que o diretório de arquivos existe.
-        """
-        self.client = app.test_client()
-        self.client.testing = True
-        os.makedirs(DIRETORIO_ARQUIVOS, exist_ok=True)
+class TestMain(unittest.TestCase):
+    def test_obter_caminhos_e_extensoes_retorna_tupla(self):
+        resultado = obter_caminhos_e_extensoes()
+        self.assertIsInstance(resultado, tuple)
+        self.assertEqual(len(resultado), 2)
+        self.assertIsInstance(resultado[0], list)
+        self.assertIsInstance(resultado[1], list)
 
-    def tearDown(self):
-        """
-        Limpa o ambiente de teste:
-            - Remove os arquivos de teste criados.
-        """
-        for arquivo in os.listdir(DIRETORIO_ARQUIVOS):
-            caminho = os.path.join(DIRETORIO_ARQUIVOS, arquivo)
-            os.remove(caminho)
+    def test_obter_caminhos_e_extensoes_conteudo(self):
+        caminhos, extensoes = obter_caminhos_e_extensoes()
+        self.assertIn("/home/pedro-pm-dias/Downloads/", caminhos)
+        self.assertIn("/home/pedro-pm-dias/Downloads/InvalidPath", caminhos)
+        self.assertEqual(extensoes, [".html", ".txt"])
 
-    def criar_arquivo_teste(self, nome_arquivo, conteudo=""):
-        """
-        Cria um arquivo de teste no diretório de arquivos.
+    @patch('sys.path')
+    @patch('os.path.abspath')
+    @patch('os.path.dirname')
+    def test_main_adiciona_path_se_necessario(self, mock_dirname, mock_abspath, mock_syspath):
+        mock_dirname.return_value = "/fake/path"
+        mock_abspath.return_value = "/fake/absolute/path"
+        mock_syspath.__contains__.return_value = False
 
-        Args:
-            nome_arquivo (str): Nome do arquivo a ser criado.
-            conteudo (str): Conteúdo a ser escrito no arquivo.
-        """
-        with open(
-                os.path.join(
-                    DIRETORIO_ARQUIVOS,
-                    nome_arquivo
-                ),
-                "w",
-                encoding="utf-8") as arquivo:
-            arquivo.write(conteudo)
+        with patch('builtins.print') as mock_print, patch('src.main.exibir_resultados'):
+            main()
+            mock_syspath.append.assert_called_once()
+            mock_print.assert_called_with("Iniciando a análise dos caminhos fornecidos...\n")
 
-    def test_parametro_ausente(self):
-        """
-        Testa a rota sem fornecer o parâmetro 'arquivo'.
-        """
-        resposta = self.client.get('/processar')
-        self.assertEqual(resposta.status_code, 400)
-        dados = json.loads(resposta.data)
-        self.assertEqual(dados["erro"], "O parâmetro 'arquivo' é obrigatório.")
+    @patch('sys.path')
+    @patch('src.main.exibir_resultados')
+    def test_main_nao_adiciona_path_se_ja_existe(self, mock_syspath):
+        mock_syspath.__contains__.return_value = True
 
-    def test_arquivo_nao_encontrado(self):
-        """
-        Testa a rota com um arquivo inexistente.
-        """
-        resposta = self.client.get(
-            '/processar?arquivo=arquivo_inexistente.txt'
-        )
-        self.assertEqual(resposta.status_code, 404)
-        dados = json.loads(resposta.data)
-        self.assertEqual(
-            dados["erro"],
-            "Arquivo 'arquivo_inexistente.txt' não encontrado."
-        )
+        with patch('builtins.print'):
+            main()
+            mock_syspath.append.assert_not_called()
 
-    def test_arquivo_encontrado(self):
-        """
-        Testa a rota com um arquivo existente.
-        """
-        nome_arquivo = "teste.txt"
-        self.criar_arquivo_teste(nome_arquivo, "Conteúdo de teste")
-
-        resposta = self.client.get(f'/processar?arquivo={nome_arquivo}')
-        self.assertEqual(resposta.status_code, 200)
-        dados = json.loads(resposta.data)
-        self.assertEqual(
-            dados["mensagem"],
-            f"Conteúdo do arquivo '{nome_arquivo}' foi processado com sucesso!"
-        )
+    @patch('src.main.exibir_resultados')
+    def test_main_chama_exibir_resultados_com_parametros_corretos(self, mock_exibir):
+        with patch('builtins.print'):
+            main()
+            caminhos, extensoes = obter_caminhos_e_extensoes()
+            mock_exibir.assert_called_once_with(caminhos, extensoes)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

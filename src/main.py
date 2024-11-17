@@ -1,5 +1,5 @@
 # src/main.py
-# pylint: disable=C, E
+# pylint: disable=C
 
 import sys
 import os
@@ -12,7 +12,7 @@ def obter_caminhos_e_extensoes() -> tuple:
         "/home/pedro-pm-dias/Downloads/",
         # "/home/pedro-pm-dias/Downloads/Chrome/",
         # "/home/pedro-pm-dias/Downloads/Chrome/Teste/",
-        "/home/pedro-pm-dias/Downloads/InvalidPath"
+        "/home/pedro-pm-dias/Downloads/InvalidPath",
     ]
     filtro_extensoes = [".html", ".txt"]
     return caminhos, filtro_extensoes
@@ -21,10 +21,7 @@ def obter_caminhos_e_extensoes() -> tuple:
 def main():
     # Garantir que o diretório raiz esteja no sys.path
     if os.path.abspath(os.path.dirname(__file__)) not in sys.path:
-        sys.path.append(
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), '..')))
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
     # Obter caminhos e extensões
     caminhos, filtro_extensoes = obter_caminhos_e_extensoes()
