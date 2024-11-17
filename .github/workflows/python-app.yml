@@ -53,8 +53,7 @@ jobs:
           name: coverage-report
           path: htmlcov
 
-      - name: Publicar cobertura no Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}  # Adicione seu token do Codecov
-
+      # - name: Publicar cobertura no Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
