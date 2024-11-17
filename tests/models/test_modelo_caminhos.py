@@ -3,7 +3,7 @@
 import unittest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
-from src.models.modelo_caminhos import Caminho, Arquivo, Pasta
+from models.modelo_caminhos import Caminho, Arquivo, Pasta
 
 
 class TestModeloCaminhos(unittest.TestCase):

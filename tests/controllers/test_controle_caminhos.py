@@ -5,7 +5,7 @@ import json
 from unittest.mock import patch, Mock
 from controllers.controle_caminhos import ControladorDeCaminhos
 
-# from src.models.modelo_caminhos import Caminho, Arquivo, Pasta
+# from models.modelo_caminhos import Caminho, Arquivo, Pasta
 
 
 class TestControladorDeCaminhos(unittest.TestCase):
@@ -15,22 +15,22 @@ class TestControladorDeCaminhos(unittest.TestCase):
         self.paths = ["/test/path1", "/test/path2"]
         self.controller = ControladorDeCaminhos(self.paths)
 
-    @patch('src.models.modelo_caminhos.Caminho')
+    @patch('models.modelo_caminhos.Caminho')
     def test_init_creates_caminhos_list(self, mock_caminho):
         """Testa se a lista de caminhos é criada corretamente na inicialização."""
         controller = ControladorDeCaminhos(self.paths)
         self.assertEqual(len(controller.caminhos), 2)
         mock_caminho.assert_called()
 
-    @patch('src.models.modelo_caminhos.Caminho')
+    @patch('models.modelo_caminhos.Caminho')
     def test_init_with_extension_filter(self):
         """Testa se o filtro de extensões é configurado corretamente."""
         extensions = [".txt", ".py"]
         controller = ControladorDeCaminhos(self.paths, extensions)
         self.assertEqual(controller.filtro_extensoes, extensions)
 
-    @patch('src.models.modelo_caminhos.Arquivo')
-    @patch('src.models.modelo_caminhos.Caminho')
+    @patch('models.modelo_caminhos.Arquivo')
+    @patch('models.modelo_caminhos.Caminho')
     def test_processar_arquivo_valido(self, mock_caminho, mock_arquivo):
         """Testa o processamento de um arquivo válido."""
         mock_caminho.existe = True
@@ -43,8 +43,8 @@ class TestControladorDeCaminhos(unittest.TestCase):
         self.assertEqual(result["status"], "arquivo")
         self.assertIn("conteudo", result)
 
-    @patch('src.models.modelo_caminhos.Pasta')
-    @patch('src.models.modelo_caminhos.Caminho')
+    @patch('models.modelo_caminhos.Pasta')
+    @patch('models.modelo_caminhos.Caminho')
     def test_processar_pasta_valida(self, mock_caminho, mock_pasta):
         """Testa o processamento de uma pasta válida."""
         mock_caminho.existe = True
@@ -59,7 +59,7 @@ class TestControladorDeCaminhos(unittest.TestCase):
         self.assertIn("conteudo", result)
         self.assertIn("subitens", result)
 
-    @patch('src.models.modelo_caminhos.Caminho')
+    @patch('models.modelo_caminhos.Caminho')
     def test_processar_caminho_invalido(self, mock_caminho):
         """Testa o processamento de um caminho inválido."""
         mock_caminho.existe = False
@@ -70,7 +70,7 @@ class TestControladorDeCaminhos(unittest.TestCase):
         self.assertEqual(result["status"], "inválido")
         self.assertIn("mensagem", result)
 
-    @patch('src.models.modelo_caminhos.Caminho')
+    @patch('models.modelo_caminhos.Caminho')
     def test_buscar_recursivamente_pasta_vazia(self):
         """Testa a busca recursiva em uma pasta vazia."""
         mock_caminho = Mock()
@@ -82,7 +82,7 @@ class TestControladorDeCaminhos(unittest.TestCase):
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 1)
 
-    @patch('src.models.modelo_caminhos.Caminho')
+    @patch('models.modelo_caminhos.Caminho')
     def test_buscar_recursivamente_arquivo(self, mock_caminho):
         """Testa a busca recursiva de um arquivo."""
         mock_caminho.tipo = "arquivo"

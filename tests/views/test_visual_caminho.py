@@ -3,7 +3,7 @@
 import unittest
 import json
 from unittest.mock import patch
-from src.views.visual_caminho import validar_entradas, filtrar_por_extensao, exibir_resultados
+from views.visual_caminho import validar_entradas, filtrar_por_extensao, exibir_resultados
 
 
 class TestVisualCaminho(unittest.TestCase):

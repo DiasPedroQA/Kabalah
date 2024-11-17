@@ -2,7 +2,7 @@
 
 import unittest
 from unittest.mock import patch
-from src.main import obter_caminhos_e_extensoes, main
+from main import obter_caminhos_e_extensoes, main
 
 
 class TestMain(unittest.TestCase):
@@ -27,13 +27,13 @@ class TestMain(unittest.TestCase):
         mock_abspath.return_value = "/fake/absolute/path"
         mock_syspath.__contains__.return_value = False
 
-        with patch('builtins.print') as mock_print, patch('src.main.exibir_resultados'):
+        with patch('builtins.print') as mock_print, patch('main.exibir_resultados'):
             main()
             mock_syspath.append.assert_called_once()
             mock_print.assert_called_with("Iniciando a análise dos caminhos fornecidos...\n")
 
     @patch('sys.path')
-    @patch('src.main.exibir_resultados')
+    @patch('main.exibir_resultados')
     def test_main_nao_adiciona_path_se_ja_existe(self, mock_syspath):
         mock_syspath.__contains__.return_value = True
 
@@ -41,7 +41,7 @@ class TestMain(unittest.TestCase):
             main()
             mock_syspath.append.assert_not_called()
 
-    @patch('src.main.exibir_resultados')
+    @patch('main.exibir_resultados')
     def test_main_chama_exibir_resultados_com_parametros_corretos(self, mock_exibir):
         with patch('builtins.print'):
             main()
