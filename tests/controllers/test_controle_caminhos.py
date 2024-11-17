@@ -1,107 +1,136 @@
-# pylint: disable=C, E
+# tests/controllers/test_controle_caminhos.py
 
-import unittest
+"""
+Casos de teste para a classe `ControladorDeCaminhos`.
+Os testes cobrem inicialização, processamento de arquivos e pastas,
+busca recursiva e geração de relatório JSON.
+"""
+
 import json
-from unittest.mock import patch, Mock
+from unittest.mock import patch
+import pytest
 from controllers.controle_caminhos import ControladorDeCaminhos
 
-# from models.modelo_caminhos import Caminho, Arquivo, Pasta
 
+class TestControladorDeCaminhos:
+    """
+    Classe de testes unitários para o `ControladorDeCaminhos`.
+    """
 
-class TestControladorDeCaminhos(unittest.TestCase):
-
-    def setUp(self):
-        """Configura o cenário inicial para os testes."""
-        self.paths = ["/test/path1", "/test/path2"]
-        self.controller = ControladorDeCaminhos(self.paths)
+    @pytest.fixture
+    def setup_controller(self):
+        """
+        Configura o ambiente de teste com caminhos de exemplo e uma instância do controlador.
+        """
+        paths = ["/teste/caminho1", "/teste/caminho2"]
+        controller = ControladorDeCaminhos(paths)
+        return controller, paths
 
     @patch('models.modelo_caminhos.Caminho')
-    def test_init_creates_caminhos_list(self, mock_caminho):
-        """Testa se a lista de caminhos é criada corretamente na inicialização."""
-        controller = ControladorDeCaminhos(self.paths)
-        self.assertEqual(len(controller.caminhos), 2)
+    def test_inicializa_cria_lista_de_caminhos(self, mock_caminho, setup_controller):
+        """
+        Testa se o `ControladorDeCaminhos` inicializa com uma lista de caminhos.
+        """
+        _, paths = setup_controller
+        controlador = ControladorDeCaminhos(paths)
+        assert len(controlador.caminhos) == 2
         mock_caminho.assert_called()
 
     @patch('models.modelo_caminhos.Caminho')
-    def test_init_with_extension_filter(self):
-        """Testa se o filtro de extensões é configurado corretamente."""
-        extensions = [".txt", ".py"]
-        controller = ControladorDeCaminhos(self.paths, extensions)
-        self.assertEqual(controller.filtro_extensoes, extensions)
+    def test_inicializa_com_filtro_de_extensoes(self):
+        """
+        Testa a inicialização com uma lista especificada de extensões de arquivo.
+        """
+        extensoes = [".txt", ".py"]
+        controlador = ControladorDeCaminhos(["/teste/caminho"], extensoes)
+        assert controlador.filtro_extensoes == extensoes
 
     @patch('models.modelo_caminhos.Arquivo')
     @patch('models.modelo_caminhos.Caminho')
-    def test_processar_arquivo_valido(self, mock_caminho, mock_arquivo):
-        """Testa o processamento de um arquivo válido."""
+    def test_processa_arquivo_valido(self, mock_caminho, mock_arquivo, setup_controller):
+        """
+        Testa o processamento de um arquivo válido e retorna seu conteúdo como dicionário.
+        """
+        controlador, _ = setup_controller
         mock_caminho.existe = True
         mock_caminho.tipo = "arquivo"
-        mock_caminho.path = "/test/file.txt"
-        mock_arquivo.return_value.para_dict.return_value = {"name": "file.txt"}
+        mock_caminho.path = "/teste/arquivo.txt"
+        mock_arquivo.return_value.para_dict.return_value = {"nome": "arquivo.txt"}
 
-        result = self.controller.processar_arquivo(mock_caminho)
+        resultado = controlador.processar_arquivo(mock_caminho)
 
-        self.assertEqual(result["status"], "arquivo")
-        self.assertIn("conteudo", result)
+        assert resultado["status"] == "arquivo"
+        assert "conteudo" in resultado
 
     @patch('models.modelo_caminhos.Pasta')
     @patch('models.modelo_caminhos.Caminho')
-    def test_processar_pasta_valida(self, mock_caminho, mock_pasta):
-        """Testa o processamento de uma pasta válida."""
+    def test_processa_pasta_valida(self, mock_caminho, mock_pasta, setup_controller):
+        """
+        Testa o processamento de uma pasta válida e retorna seu conteúdo como dicionário.
+        """
+        controlador, _ = setup_controller
         mock_caminho.existe = True
         mock_caminho.tipo = "pasta"
-        mock_caminho.path = "/test/folder"
+        mock_caminho.path = "/teste/pasta"
         mock_pasta.return_value.listar_arquivos.return_value = []
         mock_pasta.return_value.subitens = []
 
-        result = self.controller.processar_pasta(mock_caminho)
+        resultado = controlador.processar_pasta(mock_caminho)
 
-        self.assertEqual(result["status"], "pasta")
-        self.assertIn("conteudo", result)
-        self.assertIn("subitens", result)
+        assert resultado["status"] == "pasta"
+        assert "conteudo" in resultado
+        assert "subitens" in resultado
 
     @patch('models.modelo_caminhos.Caminho')
-    def test_processar_caminho_invalido(self, mock_caminho):
-        """Testa o processamento de um caminho inválido."""
+    def test_processa_caminho_invalido(self, mock_caminho, setup_controller):
+        """
+        Testa o processamento de um caminho inválido.
+        """
+        controlador, _ = setup_controller
         mock_caminho.existe = False
-        mock_caminho.path = "/invalid/path"
+        mock_caminho.path = "/invalido/caminho"
 
-        result = self.controller.processar_caminho(mock_caminho)
+        resultado = controlador.processar_caminho(mock_caminho)
 
-        self.assertEqual(result["status"], "inválido")
-        self.assertIn("mensagem", result)
+        assert resultado["status"] == "inválido"
+        assert "mensagem" in resultado
 
     @patch('models.modelo_caminhos.Caminho')
-    def test_buscar_recursivamente_pasta_vazia(self):
-        """Testa a busca recursiva em uma pasta vazia."""
-        mock_caminho = Mock()
+    def testbusca_recursiva_pasta_vazia(self, mock_caminho, setup_controller):
+        """
+        Testa a funcionalidade de busca recursiva para uma pasta vazia.
+        """
+        controlador, _ = setup_controller
         mock_caminho.tipo = "pasta"
         mock_caminho.subitens = []
 
-        result = self.controller.buscar_recursivamente(mock_caminho)
+        resultado = controlador.buscar_recursivamente(mock_caminho)
 
-        self.assertIsInstance(result, list)
-        self.assertEqual(len(result), 1)
+        assert isinstance(resultado, list)
+        assert len(resultado) == 1
 
     @patch('models.modelo_caminhos.Caminho')
-    def test_buscar_recursivamente_arquivo(self, mock_caminho):
-        """Testa a busca recursiva de um arquivo."""
+    def testbusca_recursiva_arquivo(self, mock_caminho, setup_controller):
+        """
+        Testa a busca recursiva para um arquivo.
+        """
+        controlador, _ = setup_controller
         mock_caminho.tipo = "arquivo"
 
-        result = self.controller.buscar_recursivamente(mock_caminho)
+        resultado = controlador.buscar_recursivamente(mock_caminho)
 
-        self.assertIsInstance(result, list)
-        self.assertEqual(len(result), 1)
+        assert isinstance(resultado, list)
+        assert len(resultado) == 1
 
-    def test_gerar_relatorio_json_formato(self):
-        """Testa a geração do relatório JSON e seu formato."""
-        with patch.object(self.controller, 'processar_e_gerar_json') as mock_process:
-            mock_process.return_value = [{"status": "arquivo", "path": "/test/file.txt"}]
-            result = self.controller.gerar_relatorio_json()
+    def test_gera_relatorio_json_formato(self, setup_controller):
+        """
+        Testa a geração de um relatório JSON e seu formato.
+        """
+        controlador, _ = setup_controller
+        with patch.object(controlador, 'processar_e_gerar_json') as mock_process:
+            mock_process.return_value = [{"status": "arquivo", "path": "/teste/arquivo.txt"}]
+            resultado = controlador.gerar_relatorio_json()
 
-            self.assertIsInstance(result, str)
-            parsed_result = json.loads(result)
-            self.assertIsInstance(parsed_result, list)
-
-
-if __name__ == '__main__':
-    unittest.main()
+            assert isinstance(resultado, str)
+            resultado_processado = json.loads(resultado)
+            assert isinstance(resultado_processado, list)

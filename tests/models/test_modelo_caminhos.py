@@ -1,94 +1,136 @@
-# pylint: disable=C, E
+# tests/models/test_modelo_caminhos.py
 
-import unittest
+"""
+Testes para classes relacionadas ao manuseio de caminhos de arquivos e diretórios.
+"""
+
 from pathlib import Path
 from unittest.mock import patch, MagicMock
+import pytest
 from models.modelo_caminhos import Caminho, Arquivo, Pasta
 
 
-class TestModeloCaminhos(unittest.TestCase):
-    def setUp(self):
-        self.test_path = Path("/test/path")
+class TestModeloCaminhos:
+    """
+    Testes para classes que manipulam caminhos usando o módulo `pathlib`.
+    """
 
-    def test_caminho_init_with_string(self):
-        caminho = Caminho("/test/path")
-        self.assertIsInstance(caminho.path, Path)
+    @pytest.fixture(autouse=True)
+    def __init__(self):
+        """
+        Inicialização da classe de teste.
+        """
+        self.caminho_teste = None
 
-    def test_caminho_init_with_path(self):
-        path_obj = Path("/test/path")
-        caminho = Caminho(path_obj)
-        self.assertEqual(caminho.path, path_obj)
+    def setup(self):
+        """
+        Configuração antes de cada teste.
+        """
+        self.caminho_teste = Path("/teste/caminho")
+
+    def test_inicializacao_caminho_com_string(self):
+        """
+        Testa se a classe Caminho é inicializada corretamente com uma string.
+        """
+        caminho = Caminho("/teste/caminho")
+        assert isinstance(caminho.path, Path)
+
+    def test_inicializacao_caminho_com_path(self):
+        """
+        Testa se a classe Caminho é inicializada corretamente com um objeto Path.
+        """
+        obj_path = Path("/teste/caminho")
+        caminho = Caminho(obj_path)
+        assert caminho.path == obj_path
 
     @patch('pathlib.Path.exists')
-    def test_caminho_existe_property(self, mock_exists):
-        mock_exists.return_value = True
-        caminho = Caminho(self.test_path)
-        self.assertTrue(caminho.existe)
+    def test_propriedade_existe_caminho(self, mock_existe):
+        """
+        Testa se a propriedade `existe` da classe Caminho funciona corretamente.
+        """
+        mock_existe.return_value = True
+        caminho = Caminho(self.caminho_teste)
+        assert caminho.existe is True
 
-    def test_arquivo_extensao_property(self):
-        with patch('pathlib.Path.is_file') as mock_is_file:
-            mock_is_file.return_value = True
-            arquivo = Arquivo("/test/file.txt")
-            self.assertEqual(arquivo.extensao, ".txt")
+    def test_propriedade_extensao_arquivo(self):
+        """
+        Testa se a extensão do arquivo é recuperada corretamente.
+        """
+        with patch('pathlib.Path.is_file', return_value=True):
+            arquivo = Arquivo("/teste/arquivo.html")
+            assert arquivo.extensao == ".html"
 
     @patch('pathlib.Path.stat')
     @patch('pathlib.Path.is_file')
-    def test_arquivo_tamanho_formatado(self, mock_is_file, mock_stat):
-        mock_is_file.return_value = True
+    def test_tamanho_formatado_arquivo(self, mock_e_arquivo, mock_stat):
+        """
+        Testa se o tamanho formatado do arquivo é calculado corretamente.
+        """
+        mock_e_arquivo.return_value = True
         mock_stat.return_value = MagicMock(st_size=2048)
-        arquivo = Arquivo("/test/file.txt")
-        self.assertEqual(arquivo.tamanho_formatado(), "2.00 kB")
+        arquivo = Arquivo("/teste/arquivo.html")
+        assert arquivo.tamanho_formatado() == "2.00 kB"
 
-    def test_arquivo_init_invalid_path(self):
-        with patch('pathlib.Path.is_file') as mock_is_file:
-            mock_is_file.return_value = False
-            with self.assertRaises(ValueError):
-                Arquivo("/test/not_a_file")
+    def test_inicializacao_arquivo_com_caminho_invalido(self):
+        """
+        Testa se a classe Arquivo gera um erro ao receber um caminho inválido.
+        """
+        with patch('pathlib.Path.is_file', return_value=False):
+            with pytest.raises(
+                ValueError, match="O caminho fornecido não é um arquivo válido"
+            ):
+                Arquivo("/teste/nao_e_arquivo")
 
-    def test_pasta_init_invalid_path(self):
-        with patch('pathlib.Path.is_dir') as mock_is_dir:
-            mock_is_dir.return_value = False
-            with self.assertRaises(ValueError):
-                Pasta("/test/not_a_directory")
+    def test_inicializacao_pasta_com_caminho_invalido(self):
+        """
+        Testa se a classe Pasta gera um erro ao receber um caminho inválido.
+        """
+        with patch('pathlib.Path.is_dir', return_value=False):
+            with pytest.raises(ValueError, match="O caminho fornecido não é uma pasta válida"):
+                Pasta("/teste/nao_e_pasta")
 
     @patch('pathlib.Path.iterdir')
     @patch('pathlib.Path.is_dir')
-    def test_pasta_listar_arquivos_com_filtro(self, mock_is_dir, mock_iterdir):
-        mock_is_dir.return_value = True
-        mock_files = [
-            MagicMock(is_file=lambda: True, suffix='.txt'),
+    def test_listar_arquivos_com_filtro_na_pasta(self, mock_e_pasta, mock_iterdir):
+        """
+        Testa se a lista de arquivos com filtros retorna os itens corretos.
+        """
+        mock_e_pasta.return_value = True
+        mock_arquivos = [
+            MagicMock(is_file=lambda: True, suffix='.html'),
             MagicMock(is_file=lambda: True, suffix='.py'),
             MagicMock(is_file=lambda: True, suffix='.jpg'),
         ]
-        mock_iterdir.return_value = mock_files
+        mock_iterdir.return_value = mock_arquivos
 
-        pasta = Pasta("/test/folder")
-        arquivos = pasta.listar_arquivos(extensoes=['.txt', '.py'])
-        self.assertEqual(len(arquivos), 2)
+        pasta = Pasta("/teste/pasta")
+        arquivos = pasta.listar_arquivos(extensoes=['.html', '.py'])
+        assert len(arquivos) == 2
 
     @patch('pathlib.Path.iterdir')
     @patch('pathlib.Path.is_dir')
-    def test_pasta_subitens_com_permission_error(self, mock_is_dir, mock_iterdir):
-        mock_is_dir.return_value = True
+    def test_subitens_com_erro_de_permissao(self, mock_e_pasta, mock_iterdir):
+        """
+        Testa o comportamento ao lidar com erros de permissão em subitens.
+        """
+        mock_e_pasta.return_value = True
         mock_iterdir.side_effect = PermissionError()
 
-        pasta = Pasta("/test/folder")
+        pasta = Pasta("/teste/pasta")
         subitens = pasta.subitens
-        self.assertEqual(len(subitens), 1)
-        self.assertIn("Inacessível", str(subitens[0].path))
+        assert len(subitens) == 1
+        assert "Inacessível" in str(subitens[0].path)
 
-    def test_caminho_para_dict_formato(self):
-        with patch('pathlib.Path.exists') as mock_exists:
-            mock_exists.return_value = True
-            caminho = Caminho("/test/path")
+    def test_converter_caminho_para_dict(self):
+        """
+        Testa se a conversão de um Caminho para dicionário funciona corretamente.
+        """
+        with patch('pathlib.Path.exists', return_value=True):
+            caminho = Caminho("/teste/caminho")
             resultado = caminho.para_dict()
 
-            self.assertIsInstance(resultado, dict)
-            self.assertIn("nome", resultado)
-            self.assertIn("caminho", resultado)
-            self.assertIn("existe", resultado)
-            self.assertIn("tipo", resultado)
-
-
-if __name__ == '__main__':
-    unittest.main()
+            assert isinstance(resultado, dict)
+            assert "nome" in resultado
+            assert "caminho" in resultado
+            assert "existe" in resultado
+            assert "tipo" in resultado
