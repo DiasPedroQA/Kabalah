@@ -1,46 +1,40 @@
-# pylint: disable=C
 # src/main.py
+# pylint: disable=C, E
 
-# import os
-# from controllers.path_controller import inicializar_controller
-# from models.path_models import processar_pasta, processar_arquivo
-# from src.views.path_view import transformar_dados
-
-
-# def processar_caminhos(caminhos):
-#     resultados = []
-
-#     for caminho in caminhos:
-#         if os.path.isdir(caminho):
-#             dados = processar_pasta(caminho)
-#             resultado = transformar_dados(dados, "pasta")
-#             resultados.append(resultado)
-#         elif os.path.isfile(caminho):
-#             dados = processar_arquivo(caminho)
-#             resultado = transformar_dados(dados, "arquivo")
-#             resultados.append(resultado)
-#         else:
-#             resultados.append({"erro": f"Caminho inválido ou inexistente: {caminho}"})
-
-#     # Aqui você pode querer fazer algo com os resultados
-#     return resultados
+import sys
+import os
+from views.visual_caminho import exibir_resultados
 
 
-# def principal():
-#     # Caminhos fictícios para as pastas e arquivos
-#     folder_path1 = "/home/pedro-pm-dias/Downloads/folder1"
-#     folder_path2 = "/home/pedro-pm-dias/Downloads/folder2"
-#     file_path1 = "/home/pedro-pm-dias/Downloads/file1.txt"
-#     file_path2 = "/home/pedro-pm-dias/Downloads/file2.txt"
-
-#     # Processamento dos caminhos pelo controller
-#     caminhos = [folder_path1, folder_path2, file_path1, file_path2]
-#     resultados = processar_caminhos(caminhos)
-#     print(resultados)
-
-#     # Inicialização da API
-#     inicializar_controller()
+def obter_caminhos_e_extensoes() -> tuple:
+    """Retorna os caminhos e as extensões de filtro como uma tupla."""
+    caminhos = [
+        "/home/pedro-pm-dias/Downloads/",
+        # "/home/pedro-pm-dias/Downloads/Chrome/",
+        # "/home/pedro-pm-dias/Downloads/Chrome/Teste/",
+        "/home/pedro-pm-dias/Downloads/InvalidPath"
+    ]
+    filtro_extensoes = [".html", ".txt"]
+    return caminhos, filtro_extensoes
 
 
-# if __name__ == "__main__":
-#     principal()
+def main():
+    # Garantir que o diretório raiz esteja no sys.path
+    if os.path.abspath(os.path.dirname(__file__)) not in sys.path:
+        sys.path.append(
+            os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__), '..')))
+
+    # Obter caminhos e extensões
+    caminhos, filtro_extensoes = obter_caminhos_e_extensoes()
+
+    # Exibir mensagem inicial
+    print("Iniciando a análise dos caminhos fornecidos...\n")
+
+    # Exibir os resultados usando a função definida em 'views'
+    exibir_resultados(caminhos, filtro_extensoes)
+
+
+if __name__ == "__main__":
+    main()
