@@ -4,137 +4,131 @@
 Testes para classes relacionadas ao manuseio de caminhos de arquivos e diretórios.
 """
 
+import json
+from unittest.mock import MagicMock, patch
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-import pytest
-from models.modelo_caminhos import Caminho, Arquivo, Pasta
-
-CAMINHO_TESTE = "/home/pedro-pm-dias/Downloads/Chrome"
-ARQUIVO_TESTE = "/home/pedro-pm-dias/Downloads/"
-PASTA_TESTE = "/home/pedro-pm-dias/Downloads/"
+from pytest import raises, fixture
+from models.modelo_caminhos import CaminhoBase
 
 
-class TestModeloCaminhos:
+class TestCaminhoBase:
     """
-    Testes para classes que manipulam caminhos usando o módulo `pathlib`.
+    Testes para a classe CaminhoBase que manipula informações de arquivos e diretórios.
     """
 
-    @pytest.fixture(autouse=True)
+    @fixture(autouse=True)
     def __init__(self):
-        """
-        Inicialização da classe de teste.
-        """
-        self.caminho_teste = None
+        self.caminho_base = None
+        self.caminho_teste = "/home/user/test/file.txt"
 
-    def setup(self):
+    def test_sanitizar_caminho_com_traversal(self):
         """
-        Configuração antes de cada teste.
+        The function `test_sanitizar_caminho_com_traversal` tests the sanitization of a path to
+        prevent directory traversal vulnerabilities.
         """
-        self.caminho_teste = Path(CAMINHO_TESTE)
+        with raises(ValueError, match="Caminho inválido: tentativa de traversal detectada"):
+            CaminhoBase("../../../etc/passwd")
 
-    def test_inicializacao_caminho_com_string(self):
+    @patch('pathlib.Path.resolve')
+    def test_sanitizar_caminho_relativo(self, mock_resolve):
         """
-        Testa se a classe Caminho é inicializada corretamente com uma string.
-        """
-        caminho = Caminho(CAMINHO_TESTE)
-        assert isinstance(caminho.path, Path)
+        The function `test_sanitizar_caminho_relativo` tests the creation of a relative path using
+        a mocked resolve function.
 
-    def test_inicializacao_caminho_com_path(self):
+        :param mock_resolve: The `mock_resolve` parameter seems to be a mock object that is being
+        used to simulate the behavior of a function or method called `resolve`. In this test case,
+        it is being set up to return a `Path` object representing the path "/home/user/test". This
+        mock object is likely used
         """
-        Testa se a classe Caminho é inicializada corretamente com um objeto Path.
-        """
-        obj_path = Path(CAMINHO_TESTE)
-        caminho = Caminho(obj_path)
-        assert caminho.path == obj_path
+        mock_resolve.return_value = Path("/home/user/test")
+        caminho = CaminhoBase("./test")
+        assert isinstance(caminho.caminho_atual, Path)
 
-    @patch('pathlib.Path.exists')
-    def test_propriedade_existe_caminho(self, mock_existe):
-        """
-        Testa se a propriedade `existe` da classe Caminho funciona corretamente.
-        """
-        mock_existe.return_value = True
-        caminho = Caminho(self.caminho_teste)
-        assert caminho.existe is True
-
-    def test_propriedade_extensao_arquivo(self):
-        """
-        Testa se a extensão do arquivo é recuperada corretamente.
-        """
-        with patch('pathlib.Path.is_file', return_value=True):
-            arquivo = Arquivo(ARQUIVO_TESTE)
-            assert arquivo.extensao == ".html"
+    def test_context_manager(self):
+        with CaminhoBase(self.caminho_teste) as cb:
+            assert isinstance(cb, CaminhoBase)
 
     @patch('pathlib.Path.stat')
+    @patch('pathlib.Path.exists')
+    def test_estatisticas_formatacao_datas(self, mock_exists, mock_stat):
+        mock_exists.return_value = True
+        mock_stat.return_value = MagicMock(
+            st_size=1024,
+            st_mtime=1632223200,
+            st_ctime=1632223200
+        )
+
+        caminho = CaminhoBase(self.caminho_teste)
+        stats = caminho.estatisticas()
+
+        assert "21/09/2021" in stats["modificado_em"]
+        assert "21/09/2021" in stats["criado_em"]
+
+    @patch('pathlib.Path.exists')
+    def test_estatisticas_arquivo_inexistente(self, mock_exists):
+        mock_exists.return_value = False
+        caminho = CaminhoBase(self.caminho_teste)
+        stats = caminho.estatisticas()
+        assert stats["status"] == "falha"
+        assert "erro" in stats
+
+    @patch('pathlib.Path.iterdir')
+    @patch('pathlib.Path.is_dir')
+    @patch('pathlib.Path.exists')
+    def test_subitens_diretorio_vazio(self, mock_exists, mock_is_dir, mock_iterdir):
+        """
+        The function tests for subitems in an empty directory.
+
+        :param mock_exists: The `mock_exists`, `mock_is_dir`, and `mock_iterdir` parameters are
+        likely mock objects that are being used to simulate the behavior of certain functions or
+        methods during testing. In this specific test case, they are being used to mock the
+        behavior of the `os.path.exists`, `os
+        :param mock_is_dir: The `mock_is_dir` parameter is a mock object that is used to simulate
+        the behavior of the `os.path.isdir` function in Python. By setting its return value to
+        `True`, the test is simulating the scenario where the path being checked is a directory.
+        This allows the test to verify
+        :param mock_iterdir: The `mock_iterdir` parameter is a mock object that is used to simulate
+        the behavior of the `os.listdir` function in Python. In this specific test case, it is
+        being used to simulate the scenario where the directory is empty, as it is returning an
+        empty list `[]`. This allows
+        """
+        mock_exists.return_value = True
+        mock_is_dir.return_value = True
+        mock_iterdir.return_value = []
+
+        caminho = CaminhoBase(self.caminho_teste)
+        resultado = caminho.obter_subitens()
+        assert resultado["subitens"] == []
+
+    @patch('pathlib.Path.exists')
     @patch('pathlib.Path.is_file')
-    def test_tamanho_formatado_arquivo(self, mock_e_arquivo, mock_stat):
-        """
-        Testa se o tamanho formatado do arquivo é calculado corretamente.
-        """
-        mock_e_arquivo.return_value = True
-        mock_stat.return_value = MagicMock(st_size=2048)
-        arquivo = Arquivo(ARQUIVO_TESTE)
-        assert arquivo.tamanho_formatado() == "2.00 kB"
+    @patch('pathlib.Path.is_dir')
+    def test_dados_caminho_tipo_desconhecido(self, mock_is_dir, mock_is_file, mock_exists):
+        mock_exists.return_value = True
+        mock_is_file.return_value = False
+        mock_is_dir.return_value = False
 
-    def test_inicializacao_arquivo_com_caminho_invalido(self):
-        """
-        Testa se a classe Arquivo gera um erro ao receber um caminho inválido.
-        """
-        with patch('pathlib.Path.is_file', return_value=False):
-            with pytest.raises(
-                ValueError, match="O caminho fornecido não é um arquivo válido"
-            ):
-                Arquivo("/teste/nao_e_arquivo")
+        caminho = CaminhoBase(self.caminho_teste)
+        resultado = caminho.dados_caminho()
+        assert resultado["tipo"] == "desconhecido"
 
-    def test_inicializacao_pasta_com_caminho_invalido(self):
-        """
-        Testa se a classe Pasta gera um erro ao receber um caminho inválido.
-        """
-        with patch('pathlib.Path.is_dir', return_value=False):
-            with pytest.raises(ValueError, match="O caminho fornecido não é uma pasta válida"):
-                Pasta("/teste/nao_e_pasta")
+    @patch('pathlib.Path.exists')
+    def test_obter_informacoes_caminho_inexistente(self, mock_exists):
+        mock_exists.return_value = False
+        caminho = CaminhoBase(self.caminho_teste)
+        resultado = json.loads(caminho.obter_informacoes())
+        assert resultado["infos"]["status"] == "falha"
+        assert "erro" in resultado["infos"]
 
     @patch('pathlib.Path.iterdir')
     @patch('pathlib.Path.is_dir')
-    def test_listar_arquivos_com_filtro_na_pasta(self, mock_e_pasta, mock_iterdir):
-        """
-        Testa se a lista de arquivos com filtros retorna os itens corretos.
-        """
-        mock_e_pasta.return_value = True
-        mock_arquivos = [
-            MagicMock(is_file=lambda: True, suffix='.html'),
-            MagicMock(is_file=lambda: True, suffix='.py'),
-            MagicMock(is_file=lambda: True, suffix='.jpg'),
-        ]
-        mock_iterdir.return_value = mock_arquivos
+    @patch('pathlib.Path.exists')
+    def test_obter_informacoes_com_subitens(self, mock_exists, mock_is_dir, mock_iterdir):
+        mock_exists.return_value = True
+        mock_is_dir.return_value = True
+        mock_iterdir.return_value = [Path("/test/sub1"), Path("/test/sub2")]
 
-        pasta = Pasta(PASTA_TESTE)
-        arquivos = pasta.listar_arquivos(extensoes=['.html', '.py'])
-        assert len(arquivos) == 2
-
-    @patch('pathlib.Path.iterdir')
-    @patch('pathlib.Path.is_dir')
-    def test_subitens_com_erro_de_permissao(self, mock_e_pasta, mock_iterdir):
-        """
-        Testa o comportamento ao lidar com erros de permissão em subitens.
-        """
-        mock_e_pasta.return_value = True
-        mock_iterdir.side_effect = PermissionError()
-
-        pasta = Pasta(PASTA_TESTE)
-        subitens = pasta.subitens
-        assert len(subitens) == 1
-        assert "Inacessível" in str(subitens[0].path)
-
-    def test_converter_caminho_para_dict(self):
-        """
-        Testa se a conversão de um Caminho para dicionário funciona corretamente.
-        """
-        with patch('pathlib.Path.exists', return_value=True):
-            caminho = Caminho(CAMINHO_TESTE)
-            resultado = caminho.para_dict()
-
-            assert isinstance(resultado, dict)
-            assert "nome" in resultado
-            assert "caminho" in resultado
-            assert "existe" in resultado
-            assert "tipo" in resultado
+        caminho = CaminhoBase(self.caminho_teste)
+        resultado = json.loads(caminho.obter_informacoes())
+        assert "subitens" in resultado["infos"]
+        assert len(resultado["infos"]["subitens"]) == 2

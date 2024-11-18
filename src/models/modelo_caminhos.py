@@ -1,209 +1,138 @@
 # src/models/modelo_caminhos.py
 
 """
-O código define classes para representar caminhos, arquivos e pastas, com métodos
-para obter informações e interagir com eles.
+Represents a base class for obtaining detailed information
+about a file or directory, returning the data in JSON format.
+
+The `CaminhoBase` class provides methods to:
+- Sanitize the path to prevent directory traversal
+- Retrieve file/directory statistics, including size in kB
+    and formatted creation/modification dates
+- List the sub-items within a directory
+- Retrieve the absolute path of the file/directory
+
+The class can be used as a context manager,
+allowing it to be used in a `with` statement.
 """
 
+import json
+import os
+from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Dict, List, Optional
 
 
-class Caminho:
+class CaminhoBase:
     """
-    A classe `Caminho` fornece métodos para manipular caminhos de arquivos,
-    incluindo verificar a existência, obter o nome, determinar o tipo
-    (diretório ou arquivo) e converter informações do caminho para um dicionário.
+    Classe para representar e obter informações detalhadas sobre um arquivo ou diretório,
+    retornando os dados em formato JSON.
     """
 
-    def __init__(self, caminho: Union[str, Path]):
+    def __init__(self, caminho: str) -> None:
         """
-        Inicializa o objeto com um atributo de caminho, aceitando uma string
-        ou um objeto `Path`.
+        Inicializa a classe com o caminho especificado.
+        :param caminho: Caminho do arquivo ou diretório.
+        """
+        self.caminho_atual = Path(self._sanitizar_e_resolver_caminho(caminho))
 
-        :param caminho: Caminho em formato de string ou objeto `Path`.
+    def __enter__(self) -> "CaminhoBase":
         """
-        self.path = Path(caminho)
+        Permite usar a classe como gerenciador de contexto.
+        """
+        return self
 
-    @property
-    def existe(self) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """
-        Verifica se o caminho especificado existe.
+        Método de limpeza ao sair do contexto. Não realiza nenhuma ação específica aqui.
+        """
+        return None
 
-        :return: Verdadeiro se o caminho existe, caso contrário, Falso.
+    def _sanitizar_e_resolver_caminho(self, caminho: str) -> Optional[str]:
         """
-        return self.path.exists()
+        Sanitiza o caminho, previne traversal de diretórios e retorna o caminho absoluto.
+        """
+        sanitized_path = os.path.normpath(caminho)
 
-    @property
-    def nome(self) -> str:
-        """
-        Retorna o nome do caminho.
+        # Prevenir traversal de diretórios
+        if ".." in sanitized_path.split(os.sep):
+            raise ValueError("Caminho inválido: tentativa de traversal detectada.")
 
-        :return: Nome do caminho.
-        """
-        return self.path.name
+        # Retorna o caminho absoluto
+        caminho = Path(sanitized_path)
+        return str(caminho.resolve() if not caminho.is_absolute() else caminho.absolute())
 
-    @property
-    def tipo(self) -> str:
+    def _estatisticas(self) -> Dict:
         """
-        Determina se o caminho é um diretório, um arquivo ou inválido.
+        Obtém as estatísticas do arquivo ou diretório, incluindo o tamanho em kB
+        e as datas formatadas no padrão brasileiro.
+        """
+        try:
+            stats = self.caminho_atual.stat()
+            tamanho_kb = stats.st_size / 1024
+            return {
+                "tamanho_em_kB": round(tamanho_kb, 2),
+                "modificado_em": datetime.fromtimestamp(stats.st_mtime).strftime(
+                    "%d/%m/%Y %H:%M:%S"
+                ),
+                "criado_em": datetime.fromtimestamp(stats.st_ctime).strftime(
+                    "%d/%m/%Y %H:%M:%S"
+                ),
+            }
+        except FileNotFoundError:
+            return {"status": "falha", "erro": "Caminho não encontrado"}
 
-        :return: "pasta" se for um diretório, "arquivo" se for um arquivo,
-                 ou "inválido" caso contrário.
+    def _subitens(self) -> Dict[str, List[str]]:
         """
-        if self.is_diretorio():
-            return "pasta"
-        if self.is_arquivo():
-            return "arquivo"
-        return "inválido"
+        Retorna os subitens dentro de um diretório, se for um diretório.
+        """
+        if not self.caminho_atual.exists() or not self.caminho_atual.is_dir():
+            return {"subitens": []}
+        return {"subitens": [str(item) for item in self.caminho_atual.iterdir()]}
 
-    def is_diretorio(self) -> bool:
+    def dados_caminho(self) -> Dict:
         """
-        Verifica se o caminho é um diretório.
+        Obtém diversas informações sobre o caminho, incluindo nome, extensão, etc.
+        """
+        if not self.caminho_atual.exists():
+            return {"status": "falha", "erro": "O caminho especificado não existe"}
 
-        :return: Verdadeiro se for um diretório, caso contrário, Falso.
-        """
-        return self.path.is_dir()
-
-    def is_arquivo(self) -> bool:
-        """
-        Verifica se o caminho é um arquivo.
-
-        :return: Verdadeiro se for um arquivo, caso contrário, Falso.
-        """
-        return self.path.is_file()
-
-    def para_dict(self) -> dict:
-        """
-        Converte informações do caminho para um dicionário.
-
-        :return: Dicionário com informações do caminho.
-        """
         return {
-            "nome": self.nome,
-            "caminho": str(self.path),
-            "existe": self.existe,
-            "tipo": self.tipo,
+            "tipo": (
+                "arquivo"
+                if self.caminho_atual.is_file()
+                else "diretório" if self.caminho_atual.is_dir() else "desconhecido"
+            ),
+            "diretorio_pai": str(self.caminho_atual.parent),
+            "nome": str(self.caminho_atual.stem + self.caminho_atual.suffix),
+            "caminho_absoluto": self._sanitizar_e_resolver_caminho(str(self.caminho_atual)),
+            "estatisticas": self._estatisticas(),
         }
 
-
-class Arquivo(Caminho):
-    """
-    Representa um arquivo no sistema de arquivos, estendendo a classe `Caminho`.
-    """
-
-    def __init__(self, caminho: Union[str, Path]):
+    def obter_informacoes(self) -> str:
         """
-        Inicializa um objeto para representar um arquivo. Levanta um erro
-        se o caminho não for um arquivo.
-
-        :param caminho: Caminho do arquivo.
-        :raises ValueError: Se o caminho não for um arquivo.
+        Converte as informações para um formato JSON.
         """
-        super().__init__(caminho)
-        if not self.is_arquivo():
-            raise ValueError(f"O caminho {self.path} não é um arquivo.")
-
-    @property
-    def extensao(self) -> str:
-        """
-        Retorna a extensão do arquivo.
-
-        :return: Extensão do arquivo.
-        """
-        return self.path.suffix
-
-    @property
-    def tamanho(self) -> int:
-        """
-        Retorna o tamanho do arquivo em bytes.
-
-        :return: Tamanho do arquivo em bytes.
-        """
-        return self.path.stat().st_size
-
-    def tamanho_formatado(self) -> str:
-        """
-        Retorna o tamanho do arquivo formatado em kB.
-
-        :return: Tamanho formatado como string.
-        """
-        return f"{self.tamanho / 1024:.2f} kB"
-
-    def para_dict(self) -> dict:
-        """
-        Adiciona informações adicionais (extensão e tamanho) ao dicionário
-        de informações do arquivo.
-
-        :return: Dicionário com informações do arquivo.
-        """
-        dados = super().para_dict()
-        dados.update(
-            {
-                "extensao": self.extensao,
-                "tamanho": self.tamanho_formatado(),
-            }
-        )
-        return dados
+        infos = self.dados_caminho()
+        subitens = self._subitens()
+        if subitens["subitens"]:
+            infos.update(subitens)
+        return json.dumps({"infos": infos}, indent=4, ensure_ascii=False)
 
 
-class Pasta(Caminho):
-    """
-    Representa uma pasta no sistema de arquivos, estendendo a classe `Caminho`.
-    """
+# Exemplo de uso:
+if __name__ == "__main__":
+    caminho_diretorio = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/')
+    print("\nInformações (em JSON) do diretório =>", caminho_diretorio.obter_informacoes())
 
-    def __init__(self, caminho: Union[str, Path]):
-        """
-        Inicializa um objeto para representar uma pasta. Levanta um erro
-        se o caminho não for um diretório.
+    caminho_teste = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/Teste/')
+    print("\nInformações (em JSON) do diretório =>", caminho_teste.obter_informacoes())
 
-        :param caminho: Caminho do diretório.
-        :raises ValueError: Se o caminho não for um diretório.
-        """
-        super().__init__(caminho)
-        if not self.is_diretorio():
-            raise ValueError(f"O caminho {self.path} não é uma pasta.")
+    caminho_arquivo = CaminhoBase(
+        '/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html'
+    )
+    print("\nInformações (em JSON) do arquivo =>", caminho_arquivo.obter_informacoes())
 
-    @property
-    def subitens(self) -> List[Caminho]:
-        """
-        Lista os subitens (arquivos e diretórios) dentro da pasta.
-
-        :return: Lista de objetos `Caminho` representando os subitens.
-        """
-        itens = []
-        try:
-            for item in self.path.iterdir():
-                if item.is_file():
-                    itens.append(Arquivo(item))
-                elif item.is_dir():
-                    itens.append(Pasta(item))
-        except PermissionError:
-            itens.append(Caminho(f"Inacessível: {self.path}"))
-        return itens
-
-    def listar_arquivos(self, extensoes: Optional[List[str]] = None) -> List[Arquivo]:
-        """
-        Lista arquivos na pasta, filtrando por extensões se especificadas.
-
-        :param extensoes: Lista de extensões para filtrar os arquivos.
-        :return: Lista de objetos `Arquivo`.
-        """
-        arquivos = []
-        try:
-            arquivos = [Arquivo(f) for f in self.path.iterdir() if f.is_file()]
-            if extensoes:
-                arquivos = [arq for arq in arquivos if arq.extensao in extensoes]
-        except PermissionError:
-            pass
-        return arquivos
-
-    def para_dict(self) -> dict:
-        """
-        Adiciona informações dos subitens ao dicionário da pasta.
-
-        :return: Dicionário com informações da pasta.
-        """
-        dados = super().para_dict()
-        dados.update({"subitens": [item.para_dict() for item in self.subitens]})
-        return dados
+    caminho_arquivo = CaminhoBase(
+        '/home/pedro-pm-dias/Downloads/Chrome/InvalidPath'
+    )
+    print("\nInformações (em JSON) do arquivo =>", caminho_arquivo.obter_informacoes())
