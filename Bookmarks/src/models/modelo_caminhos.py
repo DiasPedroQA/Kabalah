@@ -17,7 +17,6 @@ allowing it to be used in a `with` statement.
 
 import json
 import os
-import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -127,31 +126,34 @@ class CaminhoBase:
 
 
 # Exemplo de uso:
-if __name__ == "__main__":
-    caminho_diretorio = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/')
-    print("\nInformações (em JSON) do diretório =>", caminho_diretorio.obter_informacoes())
+# if __name__ == "__main__":
+#     caminho_diretorio = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/')
+#     resultado1 = json.loads(caminho_diretorio.obter_informacoes())
+#     print("\nInformações (em JSON) do diretório =>", resultado1)
 
-    caminho_arquivo = CaminhoBase(
-        '/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html'
-    )
-    print("\nInformações (em JSON) do arquivo =>", caminho_arquivo.obter_informacoes())
+#     caminho_arquivo = CaminhoBase(
+#         '/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html'
+#     )
+#     resultado2 = json.loads(caminho_arquivo.obter_informacoes())
+#     print("\nInformações (em JSON) do arquivo =>", resultado2)
 
-    caminho_teste1 = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/Teste/')
-    print("\nInformações (em JSON) do teste1 =>", caminho_teste1.obter_informacoes())
+#     caminho_teste1 = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/Teste/')
+#     resultado3 = json.loads(caminho_teste1.obter_informacoes())
+#     print("\nInformações (em JSON) do teste1 =>", resultado3)
 
-    caminho_teste2 = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/InvalidPath')
-    print("\nInformações (em JSON) do teste2 =>", caminho_teste2.obter_informacoes())
+#     caminho_teste2 = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/InvalidPath')
+#     resultado4 = json.loads(caminho_teste2.obter_informacoes())
+#     print("\nInformações (em JSON) do teste2 =>", resultado4)
 
-    caminho_teste3 = CaminhoBase('../../Downloads/')
-    print("\nInformações (em JSON) do teste3 =>", caminho_teste3.obter_informacoes())
+#     caminho_teste3 = CaminhoBase('../../Downloads/')
+#     resultado5 = json.loads(caminho_teste3.obter_informacoes())
+#     print("\nInformações (em JSON) do teste3 =>", resultado5)
 
-    caminho_teste4 = CaminhoBase("")
-    resultado = json.loads(caminho_teste4.obter_informacoes())
-    print("\nInformações (em JSON) do teste4 =>", resultado)
-    assert "infos" in resultado
+#     caminho_teste4 = CaminhoBase("")
+#     resultado6 = json.loads(caminho_teste4.obter_informacoes())
+#     print("\nInformações (em JSON) do teste4 =>", resultado6)
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        caminho = CaminhoBase(temp_dir)
-        resultado = json.loads(caminho.obter_informacoes())
-        # assert "subitens" in resultado["infos"]
-        # assert len(resultado["infos"]["subitens"]) == 0
+#     with tempfile.TemporaryDirectory() as temp_dir:
+#         caminho_teste5 = CaminhoBase(temp_dir)
+#         resultado7 = json.loads(caminho_teste5.obter_informacoes())
+#         print("\nInformações (em JSON) do teste5 =>", resultado7)

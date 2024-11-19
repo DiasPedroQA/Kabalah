@@ -1,92 +1,88 @@
 # src/controllers/controle_caminhos.py
-# pylint: disable=C
+# pylint: disable=E0401, C0413
+
+"""
+Controller para processar caminhos de arquivos e diretórios, gerando relatórios em JSON.
+"""
 
 import json
-from typing import List, Optional
-from models.modelo_caminhos import Caminho, Arquivo, Pasta
+from typing import List, Optional, Dict, Union
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+from src.models.modelo_caminhos import CaminhoBase
 
 
 class ControladorDeCaminhos:
-    def __init__(self, paths: List[str], filtro_extensoes: Optional[List[str]] = None):
-        self.caminhos = [Caminho(path) for path in paths]
+    """
+    This class likely manages or controls paths in a system.
+    """
+    def __init__(
+        self, lista_caminhos: List[str], filtro_extensoes: Optional[List[str]] = None
+    ):
+        """
+        Inicializa o controlador com os caminhos a serem processados e um filtro opcional.
+
+        :param caminhos: Lista de caminhos de arquivos ou diretórios.
+        :param filtro_extensoes: Lista de extensões para filtrar arquivos (ex.: ['.txt', '.json']).
+        """
+        self.caminhos = lista_caminhos
         self.filtro_extensoes = filtro_extensoes
 
-    def processar_e_gerar_json(self) -> List[dict]:
-        """Processa todos os caminhos fornecidos e retorna um relatório."""
+    def processar_caminhos(self) -> List[Dict[str, Union[str, dict]]]:
+        """
+        Processa todos os caminhos fornecidos e retorna um relatório detalhado.
+        """
         resultados = []
         for caminho in self.caminhos:
-            encontrados = self.buscar_recursivamente(caminho)  # Busca recursiva  # noqa
-            for item in encontrados:
-                resultados.append(
-                    self.processar_caminho(item)
-                )  # Processa cada item encontrado  # noqa
+            with CaminhoBase(caminho) as caminho_base:
+                resultados.append(self._processar_caminho(caminho_base))
         return resultados
 
-    def processar_caminho(self, caminho: Caminho) -> dict:
-        """Processa um único caminho e retorna o resultado adequado."""
-        if not caminho.existe:
-            return {"status": "inválido", "mensagem": f"O caminho {caminho.path} não existe."}
-        if caminho.tipo == "pasta":
-            return self.processar_pasta(caminho)
-        if caminho.tipo == "arquivo":
-            return self.processar_arquivo(caminho)
-        return {}
+    def _processar_caminho(self, caminho: CaminhoBase) -> Dict[str, Union[str, dict]]:
+        """
+        Processa um único caminho e gera um relatório sobre ele.
 
-    def processar_pasta(self, caminho: Caminho) -> dict:
-        """Processa um caminho que é uma pasta."""
-        try:
-            pasta = Pasta(caminho.path)
-            arquivos = pasta.listar_arquivos(self.filtro_extensoes)
-            subitens = pasta.subitens  # Buscando subitens (subpastas e arquivos)  # noqa
-            return {
-                "status": "pasta",
-                "mensagem": f"O caminho {caminho.path} é uma pasta.",
-                "conteudo": [arquivo.para_dict() for arquivo in arquivos],
-                "subitens": [
-                    item.para_dict() for item in subitens
-                ],  # Incluindo subpastas  # noqa
-            }
-        except ValueError as e:
-            return {
-                "status": "erro",
-                "mensagem": f"Erro ao processar pasta {caminho.path}: {str(e)}",
-            }
+        :param caminho: Instância de `CaminhoBase`.
+        :return: Dicionário com informações detalhadas.
+        """
+        dados = json.loads(caminho.obter_informacoes())
+        infos = dados.get("infos", {})
 
-    def processar_arquivo(self, caminho: Caminho) -> dict:
-        """Processa um caminho que é um arquivo."""
-        try:
-            arquivo = Arquivo(caminho.path)
-            return {
-                "status": "arquivo",
-                "mensagem": f"O caminho {caminho.path} é um arquivo.",
-                "conteudo": arquivo.para_dict(),
-            }
-        except ValueError as e:
-            return {
-                "status": "erro",
-                "mensagem": f"Erro ao processar o arquivo {caminho.path}: {str(e)}",  # noqa
-            }
+        if infos.get("tipo") == "diretório":
+            subitens = infos.get("subitens", [])
+            if self.filtro_extensoes:
+                subitens = [
+                    item
+                    for item in subitens
+                    if any(item.endswith(ext) for ext in self.filtro_extensoes)
+                ]
+            infos["subitens_filtrados"] = subitens
 
-    def buscar_recursivamente(self, caminho: Caminho) -> List[Caminho]:
-        """Busca recursivamente por arquivos e pastas dentro de uma pasta."""
-        encontrados = []
-        if caminho.tipo == "pasta":
-            try:
-                pasta = Pasta(caminho.path)
-                encontrados.append(pasta)  # Adiciona a própria pasta
-                for subitem in pasta.subitens:
-                    encontrados.extend(
-                        self.buscar_recursivamente(subitem)
-                    )  # Chamada recursiva  # noqa
-            except ValueError:
-                pass  # Ignora pastas que não podem ser acessadas
-        elif caminho.tipo == "arquivo":
-            encontrados.append(Arquivo(caminho.path))  # Adiciona o arquivo encontrado  # noqa
-        return encontrados
+        return infos
 
     def gerar_relatorio_json(self) -> str:
-        """Processa todos os caminhos e gera o relatório em formato JSON."""
-        resultados = (
-            self.processar_e_gerar_json()
-        )  # Usa o método de processamento de caminhos  # noqa
+        """
+        Gera o relatório dos caminhos processados em formato JSON.
+
+        :return: String JSON contendo o relatório.
+        """
+        resultados = self.processar_caminhos()
         return json.dumps(resultados, ensure_ascii=False, indent=4)
+
+
+# Exemplo de uso:
+# if __name__ == "__main__":
+#     caminhos = [
+#         "/home/pedro-pm-dias/Downloads/Chrome/",
+#         "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html",
+#         "/home/pedro-pm-dias/Downloads/Chrome/Teste/",
+#         "/home/pedro-pm-dias/Downloads/Chrome/InvalidPath",  # Caminho inválido
+#         "../../Downloads/",  # Caminho relativo para a pasta Downloads/
+#         "",  # Caminho vazio
+#     ]
+#     controlador = ControladorDeCaminhos(caminhos, filtro_extensoes=[".txt", ".json"])
+#     relatorio = controlador.gerar_relatorio_json()
+#     print(relatorio)

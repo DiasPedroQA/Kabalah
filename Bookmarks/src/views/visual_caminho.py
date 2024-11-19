@@ -1,63 +1,95 @@
 # src/views/visual_caminho.py
-# pylint: disable=C
+
+"""
+Valida os parâmetros de entrada para a função `exibir_resultados`.
+
+Args:
+    caminhos (List[str]): Uma lista de caminhos de arquivos para analisar.
+    extensoes (Optional[List[str]]): Uma lista opcional de extensões
+    de arquivos para filtrar os resultados.
+
+Returns:
+    str ou None: Uma mensagem de erro se as entradas forem inválidas,
+    ou `None` se as entradas forem válidas.
+"""
 
 import json
 from typing import List, Optional
-from controllers.controle_caminhos import ControladorDeCaminhos
+from src.controllers.controle_caminhos import ControladorDeCaminhos
 
 
 def validar_entradas(caminhos: List[str], extensoes: Optional[List[str]]):
-    if not isinstance(caminhos, list):
-        return "'caminhos' deve ser uma lista de strings representando caminhos."  # noqa
+    """
+    Valida os parâmetros de entrada para a função `exibir_resultados`.
 
-    if any(not isinstance(caminho, str) for caminho in caminhos):
-        return "Todos os itens em 'caminhos' devem ser do tipo string."
+    Args:
+        caminhos (List[str]): Uma lista de caminhos de arquivos para analisar.
+        extensoes (Optional[List[str]]): Uma lista opcional de extensões
+        de arquivos para filtrar os resultados.
 
-    if extensoes and not isinstance(extensoes, list):
-        return "'extensoes' deve ser uma lista de strings representando extensões."  # noqa
+    Retorna:
+        str ou None: Uma mensagem de erro caso as entradas sejam inválidas,
+        ou `None` caso as entradas sejam válidas.
+    """
+    if not all(isinstance(caminho, str) for caminho in caminhos):
+        return "'caminhos' deve ser uma lista de strings."
 
-    if extensoes and any(not isinstance(extensao, str) for extensao in extensoes):  # noqa
-        return "Todos os itens em 'extensoes' devem ser do tipo string."
+    if extensoes and not all(isinstance(extensao, str) for extensao in extensoes):
+        return "'extensoes' deve ser uma lista de strings."
 
-    return None  # Caso não haja erro
+    return None
 
 
 def filtrar_por_extensao(
     arquivos: List[dict], extensoes: Optional[List[str]]
-) -> List[dict]:  # noqa
-    """Filtra os arquivos por extensão, se as extensões forem fornecidas."""
-    if not extensoes:
-        return arquivos  # Retorna todos os arquivos se não houver filtro
+) -> List[dict]:
+    """
+    Filtra a lista de dicionários de informações de arquivos pelas extensões fornecidas.
 
-    # Filtra os arquivos que possuem a extensão dentro da lista fornecida
-    return [arquivo for arquivo in arquivos if arquivo['extensao'] in extensoes]  # noqa
+    Args:
+        arquivos (List[dict]): Uma lista de dicionários com informações sobre arquivos.
+        extensoes (Optional[List[str]]): Uma lista opcional de extensões de arquivos
+        para filtrar os resultados.
+
+    Retorna:
+        List[dict]: A lista filtrada de dicionários de informações de arquivos.
+    """
+    return (
+        [arquivo for arquivo in arquivos if arquivo["extensao"] in extensoes]
+        if extensoes
+        else arquivos
+    )
 
 
-def exibir_resultados(caminhos: List[str], extensoes: Optional[List[str]] = None):  # noqa
-    # Validação das entradas
-    erro_validacao = validar_entradas(caminhos, extensoes)
-    if erro_validacao:
-        print(f"Erro: {erro_validacao}")
+def exibir_resultados(caminhos: List[str], extensoes: Optional[List[str]] = None):
+    """
+    Exibe os resultados da análise dos caminhos fornecidos, com filtro opcional por extensões.
+
+    Args:
+        caminhos (List[str]): Uma lista de caminhos de arquivos para analisar.
+        extensoes (Optional[List[str]]): Uma lista opcional de extensões de arquivos
+        para filtrar os resultados.
+    """
+    # Valida entradas
+    erro = validar_entradas(caminhos, extensoes)
+    if erro:
+        print(f"Erro: {erro}")
         return
 
     try:
-        # Criação do controlador e processamento dos dados
+        # Processa os caminhos
         controlador = ControladorDeCaminhos(caminhos, extensoes)
-        resultados = controlador.processar_e_gerar_json()
+        resultados_json = json.loads(controlador.processar_caminhos())
 
-        # Parse do JSON para manipulação dos resultados
-        resultados_json = json.loads(resultados)  # noqa
-
-        # Filtra os arquivos, se as extensões forem fornecidas
+        # Filtra por extensão, se necessário
         for resultado in resultados_json:
             if resultado.get("status") == "pasta" and "conteudo" in resultado:
                 resultado["conteudo"] = filtrar_por_extensao(
                     resultado["conteudo"], extensoes
-                )  # noqa
+                )
 
-        # Exibe os resultados de forma legível
-        print("Resultados da análise:")
-        print(json.dumps(resultados_json, ensure_ascii=False, indent=4))  # noqa
+        # Exibe os resultados
+        print(json.dumps(resultados_json, ensure_ascii=False, indent=4))
 
     except (ValueError, TypeError, FileNotFoundError, PermissionError) as e:
         print(f"Erro ao processar caminhos: {e}")

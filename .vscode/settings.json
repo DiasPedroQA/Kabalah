@@ -1,18 +1,18 @@
 {
     // Caminho para o interpretador Python, apontando para o ambiente virtual .venv
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    
+
     // Configuração do framework de testes como pytest
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestArgs": ["tests"],  // Diretório para rodar os testes
+    "python.testing.pytestArgs": ["tests"],
 
-    // Configuração para formatação automática com Black e isort para organizar imports
+    // Configuração para formatação automática com Black e isort
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "editor.formatOnSave": true,  // Ativa formatação automática ao salvar
-    "editor.formatOnPaste": true, // Formatação automática ao colar
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
 
     // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
     "files.exclude": {
@@ -20,40 +20,30 @@
         "**/.pytest_cache": true,
         "**/__init__.py": false,
         "**/trash": true,
-        "**/.venv": true,  // Oculta o ambiente virtual se ele estiver na pasta do projeto
-        "**/*.egg-info": true  // Oculta diretórios de metadados de pacotes
+        "**/.venv": true,
+        "**/*.egg-info": true
     },
 
-    // Configurações adicionais de intellisense e análise de código
-    "python.analysis.extraPaths": ["src"],
+    // Adiciona o diretório "config" aos caminhos de análise do Python
+    "python.analysis.extraPaths": ["src", "config"],
 
-    // Ignorar erros em arquivos de teste e alguns padrões de erro irrelevantes
-    "python.analysis.ignore": ["tests"],
+    // Regras de severidade e ignorar erros específicos
     "python.analysis.diagnosticSeverityOverrides": {
         "reportOptionalSubscript": "none",
         "reportGeneralTypeIssues": "warning"
     },
 
-    // Configurações para a régua e desativação do minimapa
-    "editor.rulers": [95],  // Adiciona régua vertical em 95 caracteres para guiar o comprimento das linhas
-    "editor.minimap.enabled": false,  // Desativa o minimapa lateral
+    // Integração com arquivos de configuração adicionais
+    "python.envFile": "${workspaceFolder}/config/.env",
 
-
-    // Atalhos de controle de testes para execução e depuração no Pytest
-    "testing.defaultGutterClickAction": "debug",  // Ao clicar, depurar o teste por padrão
-
-    // Suporte para snippets e variáveis predefinidas para Python
-    "editor.snippetSuggestions": "top",  // Mostra snippets no topo das sugestões
-    "python.envFile": "${workspaceFolder}/.env",  // Arquivo de ambiente para variáveis de ambiente
-
-    // Configurações de palavras para evitar marcação de palavras técnicas como erros ortográficos
+    // Configuração de palavras técnicas para evitar erros ortográficos
     "cSpell.words": [
         "commitadas", "docparams", "docstrings", "isort", "maxfail",
         "mypy", "pycache", "pylint", "pylintrc", "pytest", "rcfile", "xdist",
         "vscode", "asyncio", "jsonc", "utf", "pep8", "argparse"
     ],
 
-    // Integração do Prettier para formatação de JSON e outros arquivos não-Python
+    // Integração do Prettier para formatação de JSON e Markdown
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
@@ -61,14 +51,10 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
 
-    // Outras configurações úteis para produtividade e navegação
-    "explorer.confirmDelete": false,  // Remove confirmação ao excluir arquivos
-    "explorer.sortOrder": "type",  // Ordena arquivos e pastas por tipo
-    "workbench.colorTheme": "Default Dark+",  // Tema escuro padrão
-    "workbench.startupEditor": "newUntitledFile",  // Abre um novo arquivo vazio ao iniciar o VS Code
-    "window.zoomLevel": 1,
-    "docwriter.progress.trackFunctions": true,
-    "docwriter.progress.trackMethods": true,
-    "docwriter.progress.trackClasses": true,
-    "docwriter.progress.trackTypes": true // Nível de zoom da interface
+    // Configurações para produtividade e navegação
+    "explorer.confirmDelete": false,
+    "explorer.sortOrder": "type",
+    "workbench.colorTheme": "Default Dark+",
+    "workbench.startupEditor": "newUntitledFile",
+    "window.zoomLevel": 1
 }

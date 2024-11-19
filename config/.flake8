@@ -3,7 +3,7 @@
 
 [flake8]
 # Definir o comprimento máximo de linha como 95 caracteres, o que é compatível com o Black.
-max-line-length = 95
+max-line-length = 100
 
 # Ignorar erros específicos para evitar falsos positivos
 # ou para se adequar às suas preferências de estilo:
@@ -14,8 +14,10 @@ ignore = E501, W503, C901
 
 # Excluir pastas e arquivos que não precisam ser analisados pelo Flake8.
 exclude = 
-    .git,
     __pycache__,
+    .pytest_cache,
+    trash,
+    .git,
     venv,
     .venv,
     docs/source/conf.py,
