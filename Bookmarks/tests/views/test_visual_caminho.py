@@ -1,5 +1,5 @@
 # tests/views/test_visual_caminho.py
-# pylint: disable=E0401, E0611, C0413
+# pylint: disable=C0413, E0401, E0611
 
 """
 Módulo de testes para funções de visualização de caminhos.

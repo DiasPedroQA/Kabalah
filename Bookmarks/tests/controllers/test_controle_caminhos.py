@@ -1,5 +1,5 @@
 # tests/controllers/test_controle_caminhos.py
-# pylint: disable=C0413
+# pylint: disable=C0413, E0401
 
 """
 Módulo de testes para a classe ControladorDeCaminhos.
@@ -53,7 +53,7 @@ class TestControladorDeCaminhos:
         """
         controlador = ControladorDeCaminhos(["/tmp"], [".xyz"])
         resultado = controlador.processar_caminhos()
-        assert resultado[0].get("subitens_filtrados", []) == []
+        assert resultado[0].get("subitens", []) == []
 
     def test_multiplos_filtros_extensao(self):
         """
@@ -62,7 +62,7 @@ class TestControladorDeCaminhos:
         """
         controlador = ControladorDeCaminhos(["/tmp"], [".txt", ".json", ".html"])
         resultado = controlador.processar_caminhos()
-        for item in resultado[0].get("subitens_filtrados", []):
+        for item in resultado[0].get("subitens", []):
             assert any(item.endswith(ext) for ext in [".txt", ".json", ".html"])
 
     def test_processar_arquivo_inexistente(self):
@@ -93,7 +93,7 @@ class TestControladorDeCaminhos:
         """
         controlador = ControladorDeCaminhos(["/tmp"], [".TXT", ".JSON"])
         resultado = controlador.processar_caminhos()
-        subitens = resultado[0].get("subitens_filtrados", [])
+        subitens = resultado[0].get("subitens", [])
         for item in subitens:
             assert not item.endswith(".txt")
             assert not item.endswith(".json")

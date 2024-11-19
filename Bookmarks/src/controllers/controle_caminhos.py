@@ -19,6 +19,7 @@ class ControladorDeCaminhos:
     """
     This class likely manages or controls paths in a system.
     """
+
     def __init__(
         self, lista_caminhos: List[str], filtro_extensoes: Optional[List[str]] = None
     ):
@@ -59,7 +60,7 @@ class ControladorDeCaminhos:
                     for item in subitens
                     if any(item.endswith(ext) for ext in self.filtro_extensoes)
                 ]
-            infos["subitens_filtrados"] = subitens
+            infos["subitens"] = subitens
 
         return infos
 

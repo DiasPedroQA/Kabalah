@@ -1,5 +1,5 @@
 # Bookmarks/tests/models/test_modelo_caminhos.py
-# pylint: disable=E0401, E0611, C0413
+# pylint: disable=C0413, E0401, E0611
 
 """
 Módulo de testes para a classe CaminhoBase, que verifica funcionalidades 
@@ -54,8 +54,8 @@ class TestCaminhoBase:
         assert isinstance(resultado["infos"]["subitens"], list)
         assert all(isinstance(item, str) for item in resultado["infos"]["subitens"])
 
-        # Testando a chave subitens_filtrados
-        assert isinstance(resultado["infos"]["subitens_filtrados"], list)
+        # Testando a chave subitens
+        assert isinstance(resultado["infos"]["subitens"], list)
 
     def test_informacoes_arquivo_favoritos(
         self,

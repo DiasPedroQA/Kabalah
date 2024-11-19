@@ -42,7 +42,7 @@ jobs:
 
       - name: Testar com pytest e gerar relatórios de cobertura
         run: |
-          pytest --cov=src --cov-report=html --cov-report=xml --cov-fail-under=80 Bookmarks/tests -vv
+          pytest --cov=Bookmarks/src --cov-report=html --cov-report=xml --cov-fail-under=80 Bookmarks/tests -vv
         continue-on-error: true
 
       - name: Enviar relatório de cobertura

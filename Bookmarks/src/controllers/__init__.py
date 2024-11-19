@@ -1,4 +1,5 @@
 # src/controllers/__init__.py
+# pylint: disable=E0401
 
 """
 Este módulo inicializa o pacote 'controllers' e disponibiliza a classe ControladorDeCaminhos.

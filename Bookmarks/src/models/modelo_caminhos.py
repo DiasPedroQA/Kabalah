@@ -123,3 +123,8 @@ class CaminhoBase:
         if subitens["subitens"]:
             infos.update(subitens)
         return json.dumps({"infos": infos}, indent=4, ensure_ascii=False)
+
+
+# Exemplo de uso com arquivo inválido
+arq_invalido = CaminhoBase("arquivo_invalido.txt")
+print(arq_invalido.obter_informacoes())

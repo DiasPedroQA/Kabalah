@@ -1,4 +1,5 @@
 # src/views/__init__.py
+# pylint: disable=E0401
 
 """
 Pacote `views` responsável pela interação com o usuário e exibição dos resultados processados.

@@ -1,4 +1,5 @@
 # src/views/visual_caminho.py
+# pylint: disable=E0401
 
 """
 Valida os parâmetros de entrada para a função `exibir_resultados`.
