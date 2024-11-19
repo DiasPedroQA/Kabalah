@@ -1,4 +1,6 @@
 # Bookmarks/tests/models/test_modelo_caminhos.py
+# pylint: disable=E0401, E0611, C0413
+
 """
 Módulo de testes para a classe CaminhoBase, que verifica funcionalidades 
 relacionadas ao gerenciamento de caminhos de arquivos e diretórios.
@@ -6,9 +8,13 @@ relacionadas ao gerenciamento de caminhos de arquivos e diretórios.
 
 import json
 import os
-from pathlib import Path
+import sys
 import tempfile
-from Bookmarks.src.models.modelo_caminhos import CaminhoBase
+from pathlib import Path
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+from src.models.modelo_caminhos import CaminhoBase
 
 
 class TestCaminhoBase:
