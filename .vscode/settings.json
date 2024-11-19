@@ -19,7 +19,7 @@
         "**/__pycache__": true,
         "**/.pytest_cache": true,
         "**/__init__.py": false,
-        "**/trash": false,
+        "**/trash": true,
         "**/.venv": true,  // Oculta o ambiente virtual se ele estiver na pasta do projeto
         "**/*.egg-info": true  // Oculta diretórios de metadados de pacotes
     },
