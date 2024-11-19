@@ -40,7 +40,7 @@
     "cSpell.words": [
         "commitadas", "docparams", "docstrings", "isort", "maxfail",
         "mypy", "pycache", "pylint", "pylintrc", "pytest", "rcfile", "xdist",
-        "vscode", "asyncio", "jsonc", "utf", "pep8", "argparse"
+        "vscode", "asyncio", "jsonc", "utf", "pep8", "argparse", "htmlcov"
     ],
 
     // Integração do Prettier para formatação de JSON e Markdown
