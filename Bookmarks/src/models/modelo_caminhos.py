@@ -123,37 +123,3 @@ class CaminhoBase:
         if subitens["subitens"]:
             infos.update(subitens)
         return json.dumps({"infos": infos}, indent=4, ensure_ascii=False)
-
-
-# Exemplo de uso:
-# if __name__ == "__main__":
-#     caminho_diretorio = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/')
-#     resultado1 = json.loads(caminho_diretorio.obter_informacoes())
-#     print("\nInformações (em JSON) do diretório =>", resultado1)
-
-#     caminho_arquivo = CaminhoBase(
-#         '/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html'
-#     )
-#     resultado2 = json.loads(caminho_arquivo.obter_informacoes())
-#     print("\nInformações (em JSON) do arquivo =>", resultado2)
-
-#     caminho_teste1 = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/Teste/')
-#     resultado3 = json.loads(caminho_teste1.obter_informacoes())
-#     print("\nInformações (em JSON) do teste1 =>", resultado3)
-
-#     caminho_teste2 = CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/InvalidPath')
-#     resultado4 = json.loads(caminho_teste2.obter_informacoes())
-#     print("\nInformações (em JSON) do teste2 =>", resultado4)
-
-#     caminho_teste3 = CaminhoBase('../../Downloads/')
-#     resultado5 = json.loads(caminho_teste3.obter_informacoes())
-#     print("\nInformações (em JSON) do teste3 =>", resultado5)
-
-#     caminho_teste4 = CaminhoBase("")
-#     resultado6 = json.loads(caminho_teste4.obter_informacoes())
-#     print("\nInformações (em JSON) do teste4 =>", resultado6)
-
-#     with tempfile.TemporaryDirectory() as temp_dir:
-#         caminho_teste5 = CaminhoBase(temp_dir)
-#         resultado7 = json.loads(caminho_teste5.obter_informacoes())
-#         print("\nInformações (em JSON) do teste5 =>", resultado7)

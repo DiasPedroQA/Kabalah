@@ -1,12 +1,13 @@
 # src/main.py
 
 """
-Provides the main entry point for the Bookmarks application.
+Fornece o ponto de entrada principal para a aplicação Bookmarks.
 
-This module sets up the necessary paths, retrieves the file paths and extensions to
-filter, and calls the `exibir_resultados` function from the `visual_caminho` module
-to display the analysis results.
+Este módulo configura os caminhos necessários, recupera os caminhos dos arquivos e as extensões para
+filtragem, e chama a função `exibir_resultados` do módulo `visual_caminho`
+para exibir os resultados da análise.
 """
+
 
 import sys
 import os
