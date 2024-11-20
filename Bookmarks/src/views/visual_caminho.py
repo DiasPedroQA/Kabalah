@@ -35,7 +35,9 @@ def validar_entradas(caminhos: List[str], extensoes: Optional[List[str]]):
     if not all(isinstance(caminho, str) for caminho in caminhos):
         return "'caminhos' deve ser uma lista de strings."
 
-    if extensoes and not all(isinstance(extensao, str) for extensao in extensoes):
+    if extensoes and not all(
+        isinstance(extensao, str) for extensao in extensoes
+    ):
         return "'extensoes' deve ser uma lista de strings."
 
     return None
@@ -45,12 +47,14 @@ def filtrar_por_extensao(
     arquivos: List[dict], extensoes: Optional[List[str]]
 ) -> List[dict]:
     """
-    Filtra a lista de dicionários de informações de arquivos pelas extensões fornecidas.
+    Filtra a lista de dicionários de informações de
+    arquivos pelas extensões fornecidas.
 
     Args:
-        arquivos (List[dict]): Uma lista de dicionários com informações sobre arquivos.
-        extensoes (Optional[List[str]]): Uma lista opcional de extensões de arquivos
-        para filtrar os resultados.
+        arquivos (List[dict]): Uma lista de dicionários
+        com informações sobre arquivos.
+        extensoes (Optional[List[str]]): Uma lista opcional
+        de extensões de arquivos para filtrar os resultados.
 
     Retorna:
         List[dict]: A lista filtrada de dicionários de informações de arquivos.
@@ -62,14 +66,17 @@ def filtrar_por_extensao(
     )
 
 
-def exibir_resultados(caminhos: List[str], extensoes: Optional[List[str]] = None):
+def exibir_resultados(
+        caminhos: List[str],
+        extensoes: Optional[List[str]] = None) -> None:
     """
-    Exibe os resultados da análise dos caminhos fornecidos, com filtro opcional por extensões.
+    Exibe os resultados da análise dos caminhos fornecidos,
+    com filtro opcional por extensões.
 
     Args:
         caminhos (List[str]): Uma lista de caminhos de arquivos para analisar.
-        extensoes (Optional[List[str]]): Uma lista opcional de extensões de arquivos
-        para filtrar os resultados.
+        extensoes (Optional[List[str]]): Uma lista opcional de extensões
+        de arquivos para filtrar os resultados.
     """
     # Valida entradas
     erro = validar_entradas(caminhos, extensoes)
@@ -80,14 +87,15 @@ def exibir_resultados(caminhos: List[str], extensoes: Optional[List[str]] = None
     try:
         # Processa os caminhos
         controlador = ControladorDeCaminhos(caminhos, extensoes)
-        resultados_json = json.loads(controlador.processar_caminhos())
+        resultados_json = controlador.processar_caminhos()
 
         # Filtra por extensão, se necessário
         for resultado in resultados_json:
             if resultado.get("status") == "pasta" and "conteudo" in resultado:
-                resultado["conteudo"] = filtrar_por_extensao(
-                    resultado["conteudo"], extensoes
-                )
+                if isinstance(resultado["conteudo"], list):
+                    resultado["conteudo"] = filtrar_por_extensao(
+                        resultado["conteudo"], extensoes
+                    )
 
         # Exibe os resultados
         print(json.dumps(resultados_json, ensure_ascii=False, indent=4))

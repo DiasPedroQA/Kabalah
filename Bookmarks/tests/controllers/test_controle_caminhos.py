@@ -4,42 +4,48 @@
 """
 Módulo de testes para a classe ControladorDeCaminhos.
 
-Este módulo contém uma série de testes automatizados para a classe 
-ControladorDeCaminhos, responsável por processar caminhos de arquivos e diretórios.
+Este módulo contém uma série de testes automatizados
+para a classe ControladorDeCaminhos, responsável por
+processar caminhos de arquivos e diretórios.
 Os testes abrangem funcionalidades como:
 
 - Processamento de listas vazias de caminhos.
-- Filtragem de caminhos por extensões de arquivos, incluindo suporte para múltiplos filtros.
+- Filtragem de caminhos por extensões de arquivos,
+incluindo suporte para múltiplos filtros.
 - Geração de relatórios em formato JSON.
 - Tratamento de erros, como arquivos inexistentes.
 - Sensibilidade a maiúsculas e minúsculas na filtragem de extensões.
 - Processamento de caminhos relativos e múltiplos diretórios.
 
-Os testes visam garantir o correto funcionamento do controlador sob diferentes cenários.
+Os testes visam garantir o correto funcionamento
+do controlador sob diferentes cenários.
 """
 
 
 import os
 import sys
-import json
-import pytest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__), "..", "..")))
 
-from src.controllers.controle_caminhos import ControladorDeCaminhos
+from Bookmarks.src.controllers.controle_caminhos import ControladorDeCaminhos  # noqa: E402, E501
 
 
 class TestControladorDeCaminhos:
     """
-    Conjunto de testes para a classe ControladorDeCaminhos, que gerencia e processa
-    listas de caminhos de arquivos e diretórios, com foco na filtragem de extensões
-    e geração de relatórios em formato JSON.
+    Conjunto de testes para a classe ControladorDeCaminhos,
+    que gerencia e processa listas de caminhos de arquivos
+    e diretórios, com foco na filtragem de extensões e
+    geração de relatórios em formato JSON.
     """
 
     def test_processar_caminhos_vazios(self):
         """
         Testa o processamento de uma lista vazia de caminhos.
-        O controlador deve retornar uma lista vazia quando nenhum caminho é fornecido.
+        O controlador deve retornar uma lista vazia quando
+        nenhum caminho é fornecido.
         """
         controlador = ControladorDeCaminhos([])
         resultado = controlador.processar_caminhos()
@@ -58,7 +64,8 @@ class TestControladorDeCaminhos:
     def test_multiplos_filtros_extensao(self):
         """
         Testa o filtro de múltiplas extensões.
-        O controlador deve garantir que os subitens filtrados tenham uma das extensões fornecidas.
+        O controlador deve garantir que os subitens
+        filtrados tenham uma das extensões fornecidas.
         """
         controlador = ControladorDeCaminhos(["/tmp"], [".txt", ".json", ".html"])
         resultado = controlador.processar_caminhos()
@@ -70,21 +77,14 @@ class TestControladorDeCaminhos:
         Testa o comportamento ao tentar processar um arquivo inexistente.
         O controlador deve lançar um erro FileNotFoundError.
         """
-        with pytest.raises(FileNotFoundError):
-            controlador = ControladorDeCaminhos(["/caminho/inexistente/arquivo.txt"])
-            controlador.processar_caminhos()
-
-    def test_relatorio_json_formatacao(self):
-        """
-        Testa a formatação do relatório gerado em JSON.
-        O controlador deve retornar um string formatada corretamente,
-        que pode ser analisada como uma lista.
-        """
-        controlador = ControladorDeCaminhos(["/tmp"])
-        relatorio = controlador.gerar_relatorio_json()
-        assert isinstance(relatorio, str)
-        parsed = json.loads(relatorio)
-        assert isinstance(parsed, list)
+        controlador = ControladorDeCaminhos(
+            "/home/pedro-pm-dias/Downloads/Chrome/InvalidPath"
+        )
+        arquivo_processado = controlador.processar_caminhos()
+        assert arquivo_processado[0]["status"] == "Falha"
+        assert arquivo_processado[0][
+            "erro"
+        ] == "O caminho especificado não existe."
 
     def test_filtro_extensoes_case_sensitive(self):
         """

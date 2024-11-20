@@ -4,21 +4,23 @@
 """
 Módulo de testes para as funções principais do aplicativo.
 
-Este módulo contém uma série de testes para as funções presentes no módulo `main` do 
-pacote `Bookmarks`. Os testes verificam o comportamento das funções que manipulam o 
+Este módulo contém uma série de testes para as funções
+presentes no módulo `main` do pacote `Bookmarks`.
+Os testes verificam o comportamento das funções que manipulam o
 caminho do sistema e a execução principal da aplicação.
 """
 
 import sys
 import os
-import pytest
+import pytest  # type: ignore
+
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from src.main import (
+from Bookmarks.src.main import (  # noqa: E402
     garantir_sys_path,
     obter_caminhos_e_extensoes,
-    main
+    main,
 )
 
 

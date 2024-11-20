@@ -16,16 +16,16 @@
 
     // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
     "files.exclude": {
-        "**/__pycache__": true,
-        "**/.pytest_cache": true,
-        "**/__init__.py": false,
         "**/trash": true,
+        "**/__pycache__": true,
+        "**/__init__.py": true,
+        "**/.pytest_cache": true,
         "**/.venv": true,
-        "**/*.egg-info": true
+        "**/*.egg-info": true,
     },
 
     // Adiciona o diretório "config" aos caminhos de análise do Python
-    "python.analysis.extraPaths": ["src", "config"],
+    "python.analysis.extraPaths": ["Bookmarks/src", "config"],
 
     // Regras de severidade e ignorar erros específicos
     "python.analysis.diagnosticSeverityOverrides": {

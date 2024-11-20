@@ -75,15 +75,17 @@ class ControladorDeCaminhos:
 
 
 # Exemplo de uso:
-# if __name__ == "__main__":
-#     caminhos = [
-#         "/home/pedro-pm-dias/Downloads/Chrome/",
-#         "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html",
-#         "/home/pedro-pm-dias/Downloads/Chrome/Teste/",
-#         "/home/pedro-pm-dias/Downloads/Chrome/InvalidPath",  # Caminho inválido
-#         "../../Downloads/",  # Caminho relativo para a pasta Downloads/
-#         "",  # Caminho vazio
-#     ]
-#     controlador = ControladorDeCaminhos(caminhos, filtro_extensoes=[".txt", ".json"])
-#     relatorio = controlador.gerar_relatorio_json()
-#     print(relatorio)
+if __name__ == "__main__":
+    caminhos = [
+        # "/home/pedro-pm-dias/Downloads/Chrome/",
+        # "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html",
+        # "/home/pedro-pm-dias/Downloads/Chrome/Teste/",
+        "/home/pedro-pm-dias/Downloads/Chrome/InvalidPath",  # Caminho inválido
+        "../../Downloads/",  # Caminho relativo para a pasta Downloads/
+        "",  # Caminho vazio
+    ]
+    controlador = ControladorDeCaminhos(caminhos, filtro_extensoes=[".txt", ".json"])
+    # relatorio = controlador.gerar_relatorio_json()
+    # print("\nrelatorio =>", relatorio)
+    processos = controlador.processar_caminhos()
+    print("\nprocessos =>", processos)

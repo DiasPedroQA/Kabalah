@@ -4,7 +4,7 @@
 """
 Módulo de testes para funções de visualização de caminhos.
 
-Este módulo contém uma série de testes automatizados para funções presentes no módulo 
+Este módulo contém uma série de testes automatizados para funções presentes no módulo.
 `visual_caminho`. Os testes garantem o correto funcionamento de funcionalidades como:
 - Validação das entradas para caminhos e extensões.
 - Filtragem de arquivos por extensão.
@@ -16,7 +16,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from src.views.visual_caminho import (
+from Bookmarks.src.views.visual_caminho import (  # noqa: E402
     exibir_resultados,
     filtrar_por_extensao,
     validar_entradas,
@@ -27,7 +27,8 @@ class TestVisualCaminho:
     """
     Classe de testes para funções de visualização de caminhos.
 
-    Contém testes para as funções de validação, filtragem e exibição de resultados de caminhos.
+    Contém testes para as funções de validação,
+    filtragem e exibição de resultados de caminhos.
     """
 
     def test_validar_entradas_caminhos_invalidos(self):

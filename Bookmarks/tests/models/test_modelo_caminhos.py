@@ -2,7 +2,7 @@
 # pylint: disable=C0413, E0401, E0611
 
 """
-Módulo de testes para a classe CaminhoBase, que verifica funcionalidades 
+Módulo de testes para a classe CaminhoBase, que verifica funcionalidades
 relacionadas ao gerenciamento de caminhos de arquivos e diretórios.
 """
 
@@ -12,9 +12,13 @@ import sys
 import tempfile
 from pathlib import Path
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__), "..", "..")))
 
-from src.models.modelo_caminhos import CaminhoBase
+
+from Bookmarks.src.models.modelo_caminhos import CaminhoBase  # noqa: E402
 
 
 class TestCaminhoBase:
@@ -52,7 +56,9 @@ class TestCaminhoBase:
 
         # Testando subitens
         assert isinstance(resultado["infos"]["subitens"], list)
-        assert all(isinstance(item, str) for item in resultado["infos"]["subitens"])
+        assert all(
+            isinstance(item, str) for item in resultado["infos"]["subitens"]
+        )
 
         # Testando a chave subitens
         assert isinstance(resultado["infos"]["subitens"], list)

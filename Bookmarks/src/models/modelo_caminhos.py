@@ -126,5 +126,8 @@ class CaminhoBase:
 
 
 # Exemplo de uso com arquivo inválido
-arq_invalido = CaminhoBase("arquivo_invalido.txt")
-print(arq_invalido.obter_informacoes())
+# arq_invalido = CaminhoBase("/home/pedro-pm-dias/Downloads/Chrome/InvalidPath")
+# print(
+#     "\n CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/InvalidPath').obter_informacoes() =>",
+#     arq_invalido.obter_informacoes(),
+# )
