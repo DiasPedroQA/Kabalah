@@ -38,6 +38,7 @@
 
     // Configuração de palavras técnicas para evitar erros ortográficos
     "cSpell.words": [
+        "addopts",
         "argparse",
         "asyncio",
         "capsys",
@@ -67,11 +68,14 @@
         "permissao",
         "permissoes",
         "pycache",
+        "pydantic",
         "pylint",
         "pylintrc",
         "pytest",
+        "pythonpath",
         "rcfile",
         "relatorio",
+        "testpaths",
         "utf",
         "vscode",
         "xdist"

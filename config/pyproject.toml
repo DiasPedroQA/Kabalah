@@ -55,7 +55,12 @@ known_first_party = ["src"]
 # Excluir pastas dos quais o isort não deve organizar imports.
 skip = ["migrations", "build", "dist"]
 
+[tool.mypy.overrides]
+"src.models.modelo_caminhos" = { ignore_missing_imports = true }
+
 [tool.mypy]
+mypy_path = "stubs"
+
 # Configurações para o mypy, que realiza verificação de tipos em tempo de execução.
 # Ignorar pastas de migrations, cache, etc.
 exclude = '/migrations/|/venv/|/tests/'
