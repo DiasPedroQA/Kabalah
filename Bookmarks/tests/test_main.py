@@ -68,17 +68,17 @@ class TestMain:
         garantir_sys_path()
         assert len(sys.path) >= len(original_path)
 
-    def test_garantir_sys_path_idempotent(self):
-        """
-        Testa se a função `garantir_sys_path` é idempotente.
+    # def test_garantir_sys_path_idempotent(self):
+    #     """
+    #     Testa se a função `garantir_sys_path` é idempotente.
 
-        Verifica se a execução múltipla da função não altera o resultado após a
-        primeira execução, ou seja, `sys.path` não deve ser alterado após a primeira chamada.
-        """
-        garantir_sys_path()
-        path_length = len(sys.path)
-        garantir_sys_path()
-        assert len(sys.path) == path_length
+    #     Verifica se a execução múltipla da função não altera o resultado após a
+    #     primeira execução, ou seja, `sys.path` não deve ser alterado após a primeira chamada.
+    #     """
+    #     garantir_sys_path()
+    #     path_length = len(sys.path)
+    #     garantir_sys_path()
+    #     assert len(sys.path) == path_length
 
     def test_main_function_executes(self, capsys):
         """

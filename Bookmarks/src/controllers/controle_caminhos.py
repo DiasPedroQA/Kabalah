@@ -1,5 +1,5 @@
 # src/controllers/controle_caminhos.py
-# pylint: disable=E0401, C0413
+# pylint: disable=E0401, E0611, C0413
 
 """
 Controller para processar caminhos de arquivos e diretórios, gerando relatórios em JSON.
@@ -12,7 +12,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from src.models.modelo_caminhos import CaminhoBase
+from src.models.modelo_caminhos import CaminhoBase  # noqa: E402
 
 
 class ControladorDeCaminhos:
@@ -75,17 +75,17 @@ class ControladorDeCaminhos:
 
 
 # Exemplo de uso:
-if __name__ == "__main__":
-    caminhos = [
-        # "/home/pedro-pm-dias/Downloads/Chrome/",
-        # "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html",
-        # "/home/pedro-pm-dias/Downloads/Chrome/Teste/",
-        "/home/pedro-pm-dias/Downloads/Chrome/InvalidPath",  # Caminho inválido
-        "../../Downloads/",  # Caminho relativo para a pasta Downloads/
-        "",  # Caminho vazio
-    ]
-    controlador = ControladorDeCaminhos(caminhos, filtro_extensoes=[".txt", ".json"])
-    # relatorio = controlador.gerar_relatorio_json()
-    # print("\nrelatorio =>", relatorio)
-    processos = controlador.processar_caminhos()
-    print("\nprocessos =>", processos)
+# if __name__ == "__main__":
+#     caminhos = [
+#         # "/home/pedro-pm-dias/Downloads/Chrome/",
+#         # "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html",
+#         # "/home/pedro-pm-dias/Downloads/Chrome/Teste/",
+#         "/home/pedro-pm-dias/Downloads/Chrome/InvalidPath",  # Caminho inválido
+#         "../../Downloads/",  # Caminho relativo para a pasta Downloads/
+#         "",  # Caminho vazio
+#     ]
+#     controlador = ControladorDeCaminhos(caminhos, filtro_extensoes=[".txt", ".json"])
+#     # relatorio = controlador.gerar_relatorio_json()
+#     # print("\nrelatorio =>", relatorio)
+#     processos = controlador.processar_caminhos()
+#     print("\nprocessos =>", processos)

@@ -1,76 +1,70 @@
-# src/models/modelo_caminhos.py
+# Bookmarks/src/models/modelo_caminhos.py
 
 """
-Represents a base class for obtaining detailed information
-about a file or directory, returning the data in JSON format.
+Módulo CaminhoBase:
+Fornece uma classe para obter informações detalhadas sobre
+arquivos ou diretórios e retorna os dados no formato JSON.
 
-The `CaminhoBase` class provides methods to:
-- Sanitize the path to prevent directory traversal
-- Retrieve file/directory statistics, including size in kB
-    and formatted creation/modification dates
-- List the sub-items within a directory
-- Retrieve the absolute path of the file/directory
-
-The class can be used as a context manager,
-allowing it to be used in a `with` statement.
+Funcionalidades:
+- Sanitização de caminhos para evitar traversal de diretórios
+- Recuperação de estatísticas do arquivo/diretório
+- Listagem de subitens (para diretórios)
+- Representação completa do caminho com informações relevantes
+- Uso como gerenciador de contexto
 """
 
 import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List
 
 
 class CaminhoBase:
     """
-    Classe para representar e obter informações detalhadas sobre um arquivo ou diretório,
-    retornando os dados em formato JSON.
+    Classe para representar um arquivo ou diretório, fornecendo informações detalhadas.
     """
 
-    def __init__(self, caminho: str) -> None:
+    def __init__(self, caminho_entrada: str) -> None:
         """
-        Inicializa a classe com o caminho especificado.
-        :param caminho: Caminho do arquivo ou diretório.
+        Inicializa a instância com o caminho fornecido.
+
+        :param caminho_entrada: Caminho do arquivo ou diretório.
         """
-        self.caminho_atual = Path(self._sanitizar_e_resolver_caminho(caminho))
+        self.caminho_atual = Path(self._sanitizar_e_resolver_caminho(caminho_entrada))
 
     def __enter__(self) -> "CaminhoBase":
-        """
-        Permite usar a classe como gerenciador de contexto.
-        """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        """
-        Método de limpeza ao sair do contexto. Não realiza nenhuma ação específica aqui.
-        """
-        return None
+        pass
 
-    def _sanitizar_e_resolver_caminho(self, caminho: str) -> Optional[str]:
+    def _sanitizar_e_resolver_caminho(self, caminho_entrada: str) -> str:
         """
-        Sanitiza o caminho, previne traversal de diretórios e retorna o caminho absoluto.
+        Sanitiza e resolve o caminho para evitar traversal de diretórios.
+
+        :param caminho_entrada: Caminho bruto fornecido.
+        :return: Caminho absoluto e resolvido.
+        :raises ValueError: Se for detectada tentativa de traversal.
         """
-        sanitized_path = os.path.normpath(caminho)
+        caminho_normalizado = os.path.normpath(caminho_entrada)
 
-        # Prevenir traversal de diretórios
-        if ".." in sanitized_path.split(os.sep):
-            return str(f"Caminho inválido: ({caminho}) tentativa de traversal detectada.")
+        if ".." in caminho_normalizado.split(os.sep):
+            raise ValueError(f"Tentativa de traversal detectada no caminho: {caminho_entrada}")
 
-        # Retorna o caminho absoluto
-        caminho = Path(sanitized_path)
-        return str(caminho.resolve() if not caminho.is_absolute() else caminho.absolute())
+        caminho_resolvido = Path(caminho_normalizado).resolve()
+        return str(caminho_resolvido)
 
-    def _estatisticas(self) -> Dict:
+    def _estatisticas(self) -> Dict[str, Any]:
         """
-        Obtém as estatísticas do arquivo ou diretório, incluindo o tamanho em kB
-        e as datas formatadas no padrão brasileiro.
+        Obtém as estatísticas do caminho, como tamanho e datas.
+
+        :return: Dicionário com as estatísticas.
         """
         try:
             stats = self.caminho_atual.stat()
-            tamanho_kb = stats.st_size / 1024
             return {
-                "tamanho_em_kB": round(tamanho_kb, 2),
+                "tamanho_em_kB": round(stats.st_size / 1024, 2),
                 "modificado_em": datetime.fromtimestamp(stats.st_mtime).strftime(
                     "%d/%m/%Y %H:%M:%S"
                 ),
@@ -80,54 +74,67 @@ class CaminhoBase:
             }
         except FileNotFoundError:
             return {
+                "erro": "Caminho não encontrado",
                 "status": "falha",
-                "erro": f"Caminho ({self.caminho_atual}) não encontrado",
+                "detalhes": f"O caminho ({str(self.caminho_atual)}) especificado não existe.",
             }
 
-    def _subitens(self) -> Dict[str, List[str]]:
+    def _subitens(self) -> List[str]:
         """
-        Retorna os subitens dentro de um diretório, se for um diretório.
-        """
-        if not self.caminho_atual.exists() or not self.caminho_atual.is_dir():
-            return {"subitens": []}
-        return {"subitens": [str(item) for item in self.caminho_atual.iterdir()]}
+        Lista os subitens do diretório, se aplicável.
 
-    def _dados_caminho(self) -> Dict:
+        :return: Lista de subitens ou vazia se não for um diretório.
         """
-        Obtém diversas informações sobre o caminho, incluindo nome, extensão, etc.
+        if self.caminho_atual.is_dir():
+            try:
+                return [str(item) for item in self.caminho_atual.iterdir()]
+            except PermissionError:
+                return ["Erro: Permissões insuficientes"]
+        return []
+
+    def _dados_caminho(self) -> Dict[str, Any]:
+        """
+        Coleta informações detalhadas do caminho.
+
+        :return: Dicionário com informações do caminho.
         """
         if not self.caminho_atual.exists():
             return {
-                "status": "falha",
-                "erro": "O caminho especificado não existe",
+                "erro": f"O caminho ({str(self.caminho_atual)}) especificado não existe"
             }
 
+        tipo = "arquivo" if self.caminho_atual.is_file() else "diretório"
         return {
-            "tipo": (
-                "arquivo"
-                if self.caminho_atual.is_file()
-                else "diretório" if self.caminho_atual.is_dir() else "desconhecido"
-            ),
+            "tipo": tipo,
             "diretorio_pai": str(self.caminho_atual.parent),
-            "nome": str(self.caminho_atual.stem + self.caminho_atual.suffix),
-            "caminho_absoluto": self._sanitizar_e_resolver_caminho(str(self.caminho_atual)),
+            "nome": self.caminho_atual.name,
+            "caminho_absoluto": str(self.caminho_atual),
             "estatisticas": self._estatisticas(),
         }
 
     def obter_informacoes(self) -> str:
         """
-        Converte as informações para um formato JSON.
+        Retorna informações detalhadas do caminho em formato JSON.
+
+        :return: Informações em formato JSON.
         """
         infos = self._dados_caminho()
-        subitens = self._subitens()
-        if subitens["subitens"]:
-            infos.update(subitens)
-        return json.dumps({"infos": infos}, indent=4, ensure_ascii=False)
+        if self.caminho_atual.is_dir():
+            infos["subitens"] = self._subitens()
+        return json.dumps(infos, indent=4, ensure_ascii=False)
 
 
-# Exemplo de uso com arquivo inválido
-# arq_invalido = CaminhoBase("/home/pedro-pm-dias/Downloads/Chrome/InvalidPath")
-# print(
-#     "\n CaminhoBase('/home/pedro-pm-dias/Downloads/Chrome/InvalidPath').obter_informacoes() =>",
-#     arq_invalido.obter_informacoes(),
-# )
+# Exemplo de uso
+if __name__ == "__main__":
+    try:
+        caminho = CaminhoBase(
+            caminho_entrada=[
+                "/home/pedro-pm-dias/Downloads/Chrome/",
+                "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html",
+                "/home/pedro-pm-dias/Downloads/Chrome/Teste",
+                "/caminho/para/teste"
+            ]
+        )
+        print("ok:", caminho.obter_informacoes())
+    except ValueError as e:
+        print(f"Erro: {e}")

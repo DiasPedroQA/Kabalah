@@ -17,8 +17,13 @@
     // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
     "files.exclude": {
         "**/trash": true,
+        "build": true,
+        "config": true,
+        "docs": true,
+        "htmlcov": true,
         "**/__pycache__": true,
         "**/__init__.py": true,
+        ".mypy_cache": true,
         "**/.pytest_cache": true,
         "**/.venv": true,
         "**/*.egg-info": true,
@@ -60,6 +65,7 @@
         "invalidos",
         "isort",
         "jsonc",
+        "Kabalah",
         "maxfail",
         "multiplas",
         "multiplos",
