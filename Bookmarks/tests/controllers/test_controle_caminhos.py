@@ -25,12 +25,9 @@ do controlador sob diferentes cenários.
 import os
 import sys
 
-sys.path.append(
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__), "..", "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from Bookmarks.src.controllers.controle_caminhos import ControladorDeCaminhos  # noqa: E402, E501
+from src.controllers.controle_caminhos import ControladorDeCaminhos  # noqa: E402, E501
 
 
 class TestControladorDeCaminhos:
@@ -82,9 +79,7 @@ class TestControladorDeCaminhos:
         )
         arquivo_processado = controlador.processar_caminhos()
         assert arquivo_processado[0]["status"] == "Falha"
-        assert arquivo_processado[0][
-            "erro"
-        ] == "O caminho especificado não existe."
+        assert arquivo_processado[0]["erro"] == "O caminho especificado não existe."
 
     def test_filtro_extensoes_case_sensitive(self):
         """
