@@ -27,7 +27,7 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from src.controllers.controle_caminhos import ControladorDeCaminhos  # noqa: E402, E501
+from Bookmarks.src.controllers.controle_caminhos import ControladorDeCaminhos  # noqa: E402, E501
 
 
 class TestControladorDeCaminhos:

@@ -15,7 +15,9 @@ from pathlib import Path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 
-from src.models.modelo_caminhos import CaminhoBase  # noqa: E402
+from Bookmarks.src.models.modelo_caminhos import (  # noqa: E402
+    CaminhoBase,
+)
 
 
 class TestCaminhoBase:
