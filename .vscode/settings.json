@@ -1,104 +1,117 @@
 {
-    // Caminho para o interpretador Python, apontando para o ambiente virtual .venv
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  // Caminho para o interpretador Python, apontando para o ambiente virtual .venv
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
 
-    // Configuração do framework de testes como pytest
-    "python.testing.pytestEnabled": true,
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestArgs": ["tests"],
+  // Configuração do framework de testes como pytest
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
 
-    // Configuração para formatação automática com Black e isort
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    },
-    "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
+  // Configuração para formatação automática com Black e isort
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
 
-    // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
-    "files.exclude": {
-        "**/trash": true,
-        "build": true,
-        "config": true,
-        "docs": true,
-        "htmlcov": true,
-        "**/__pycache__": true,
-        "**/__init__.py": true,
-        ".mypy_cache": true,
-        "**/.pytest_cache": true,
-        "**/.venv": true,
-        "**/*.egg-info": true,
-    },
+  // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
+  "files.exclude": {
+    "**/trash": true,
+    "build": true,
+    "config": true,
+    "docs": true,
+    "htmlcov": true,
+    "**/__pycache__": true,
+    "**/__init__.py": true,
+    ".mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true,
+    "**/*.egg-info": true
+  },
 
-    // Adiciona o diretório "config" aos caminhos de análise do Python
-    "python.analysis.extraPaths": ["Bookmarks/src", "config"],
+  // Adiciona o diretório "config" aos caminhos de análise do Python
+  "python.analysis.extraPaths": ["Bookmarks/src", "config"],
 
-    // Regras de severidade e ignorar erros específicos
-    "python.analysis.diagnosticSeverityOverrides": {
-        "reportOptionalSubscript": "none",
-        "reportGeneralTypeIssues": "warning"
-    },
+  // Regras de severidade e ignorar erros específicos
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportOptionalSubscript": "none",
+    "reportGeneralTypeIssues": "warning"
+  },
 
-    // Integração com arquivos de configuração adicionais
-    "python.envFile": "${workspaceFolder}/config/.env",
+  // Integração com arquivos de configuração adicionais
+  "python.envFile": "${workspaceFolder}/config/.env",
 
-    // Configuração de palavras técnicas para evitar erros ortográficos
-    "cSpell.words": [
-        "addopts",
-        "argparse",
-        "asyncio",
-        "capsys",
-        "commitadas",
-        "conteudo",
-        "correspondencia",
-        "diretorio",
-        "diretorios",
-        "docparams",
-        "docstrings",
-        "espacos",
-        "estatisticas",
-        "extensao",
-        "extensoes",
-        "formatacao",
-        "htmlcov",
-        "informacoes",
-        "inicializacao",
-        "invalidos",
-        "isort",
-        "jsonc",
-        "Kabalah",
-        "maxfail",
-        "multiplas",
-        "multiplos",
-        "mypy",
-        "pep8",
-        "permissao",
-        "permissoes",
-        "pycache",
-        "pydantic",
-        "pylint",
-        "pylintrc",
-        "pytest",
-        "pythonpath",
-        "rcfile",
-        "relatorio",
-        "testpaths",
-        "utf",
-        "vscode",
-        "xdist"
-    ],
+  // Configuração de palavras técnicas para evitar erros ortográficos
+  "cSpell.words": [
+    "addopts",
+    "argparse",
+    "asyncio",
+    "capsys",
+    "commitadas",
+    "conteudo",
+    "correspondencia",
+    "criacao",
+    "diretorio",
+    "diretorios",
+    "docparams",
+    "docstrings",
+    "espacos",
+    "estatisticas",
+    "existencia",
+    "extensao",
+    "extensoes",
+    "formatacao",
+    "htmlcov",
+    "informacoes",
+    "inicializacao",
+    "invalidos",
+    "isort",
+    "jsonc",
+    "Kabalah",
+    "levelname",
+    "maxfail",
+    "modificacao",
+    "Modificacao",
+    "multiplas",
+    "multiplos",
+    "mypy",
+    "pep8",
+    "permissao",
+    "permissoes",
+    "pycache",
+    "pydantic",
+    "pylint",
+    "pylintrc",
+    "pytest",
+    "pythonpath",
+    "rcfile",
+    "relatorio",
+    "rwxr",
+    "subdiretorio",
+    "testpaths",
+    "unico",
+    "utf",
+    "varios",
+    "vscode",
+    "xdist"
+  ],
 
-    // Integração do Prettier para formatação de JSON e Markdown
-    "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[markdown]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
+  // Integração do Prettier para formatação de JSON e Markdown
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 
-    // Configurações para produtividade e navegação
-    "explorer.confirmDelete": false,
-    "explorer.sortOrder": "type",
-    "workbench.colorTheme": "Default Dark+",
-    "workbench.startupEditor": "newUntitledFile",
-    "window.zoomLevel": 1
+  // Configurações para produtividade e navegação
+  "explorer.confirmDelete": false,
+  "explorer.sortOrder": "type",
+  "workbench.colorTheme": "Default Dark+",
+  "workbench.startupEditor": "newUntitledFile",
+  "window.zoomLevel": 1,
+  "python.analysis.typeCheckingMode": "standard",
+  "cSpell.enabledFileTypes": {
+    "python": true
+  }
 }

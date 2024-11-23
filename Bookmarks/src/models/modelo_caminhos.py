@@ -1,140 +1,265 @@
 # Bookmarks/src/models/modelo_caminhos.py
 
 """
-Módulo CaminhoBase:
-Fornece uma classe para obter informações detalhadas sobre
-arquivos ou diretórios e retorna os dados no formato JSON.
+Este módulo contém classes para análise e manipulação de caminhos no sistema de arquivos.
+
+Classes:
+    - Arquivo: Representa um arquivo e fornece informações estruturadas sobre ele.
+    - Pasta: Representa uma pasta e fornece informações estruturadas, incluindo subitens.
+    - PathFinder: Processa e analisa caminhos fornecidos, identificando arquivos e pastas,
+      e fornecendo estatísticas detalhadas como tamanho, data de criação e última modificação.
 
 Funcionalidades:
-- Sanitização de caminhos para evitar traversal de diretórios
-- Recuperação de estatísticas do arquivo/diretório
-- Listagem de subitens (para diretórios)
-- Representação completa do caminho com informações relevantes
-- Uso como gerenciador de contexto
+    - Análise de caminhos válidos e inválidos.
+    - Correção de caminhos relativos usando regex.
+    - Geração de informações detalhadas em formato JSON.
+
+Exemplo de uso:
+    ```
+    caminhos = ["../Downloads/arquivo.txt", "/caminho/invalido"]
+    path_finder = PathFinder(caminhos)
+    resultado = path_finder.analisar_caminhos_com_regex()
+    print(resultado)
+    ```
 """
 
+import re
+from typing import List, Union
 import json
-import os
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from datetime import datetime
 
 
-class CaminhoBase:
+class Arquivo:
     """
-    Classe para representar um arquivo ou diretório, fornecendo informações detalhadas.
+    Representa um arquivo no sistema de arquivos, fornecendo informações
+    estruturais e estatísticas relacionadas a ele.
+
+    Atributos:
+        _caminho (Path): Caminho completo para o arquivo.
+        _estrutura (dict): Informações sobre a estrutura do arquivo, incluindo:
+            - "nome_arquivo": Nome do arquivo.
+            - "pastaMae": Caminho do diretório pai do arquivo.
+        _estatisticas (dict): Estatísticas do arquivo, incluindo tamanho, data de criação
+                             e última modificação.
     """
 
-    def __init__(self, caminho_entrada: str) -> None:
+    def __init__(self, caminho: Path, estatisticas: dict):
         """
-        Inicializa a instância com o caminho fornecido.
+        Inicializa um objeto `Arquivo` com o caminho e as estatísticas fornecidos.
 
-        :param caminho_entrada: Caminho do arquivo ou diretório.
+        Args:
+            caminho (Path): O caminho completo para o arquivo.
+            estatisticas (dict): Dicionário contendo informações estatísticas do arquivo,
+                                 como tamanho, data de criação e última modificação.
         """
-        self.caminho_atual = Path(self._sanitizar_e_resolver_caminho(caminho_entrada))
+        self._caminho = caminho
+        self._estrutura = {
+            "nome_arquivo": self._caminho.name,
+            "pastaMae": str(self._caminho.parent),
+        }
+        self._estatisticas = estatisticas
 
-    def __enter__(self) -> "CaminhoBase":
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        pass
-
-    def _sanitizar_e_resolver_caminho(self, caminho_entrada: str) -> str:
+    def to_dict(self) -> dict:
         """
-        Sanitiza e resolve o caminho para evitar traversal de diretórios.
+        Converte as informações do objeto `Arquivo` para um dicionário.
 
-        :param caminho_entrada: Caminho bruto fornecido.
-        :return: Caminho absoluto e resolvido.
-        :raises ValueError: Se for detectada tentativa de traversal.
+        Returns:
+            dict: Um dicionário contendo:
+                - "natureza": Tipo do objeto ("ARQUIVO").
+                - "infos": Sub-dicionário com:
+                    - "estrutura": Informações estruturais do arquivo (nome, pasta mãe).
+                    - "estatisticas": Informações estatísticas do arquivo (tamanho,
+                                      data de criação, última modificação).
         """
-        caminho_normalizado = os.path.normpath(caminho_entrada)
-
-        if ".." in caminho_normalizado.split(os.sep):
-            raise ValueError(f"Tentativa de traversal detectada no caminho: {caminho_entrada}")
-
-        caminho_resolvido = Path(caminho_normalizado).resolve()
-        return str(caminho_resolvido)
-
-    def _estatisticas(self) -> Dict[str, Any]:
-        """
-        Obtém as estatísticas do caminho, como tamanho e datas.
-
-        :return: Dicionário com as estatísticas.
-        """
-        try:
-            stats = self.caminho_atual.stat()
-            return {
-                "tamanho_em_kB": round(stats.st_size / 1024, 2),
-                "modificado_em": datetime.fromtimestamp(stats.st_mtime).strftime(
-                    "%d/%m/%Y %H:%M:%S"
-                ),
-                "criado_em": datetime.fromtimestamp(stats.st_ctime).strftime(
-                    "%d/%m/%Y %H:%M:%S"
-                ),
-            }
-        except FileNotFoundError:
-            return {
-                "erro": "Caminho não encontrado",
-                "status": "falha",
-                "detalhes": f"O caminho ({str(self.caminho_atual)}) especificado não existe.",
-            }
-
-    def _subitens(self) -> List[str]:
-        """
-        Lista os subitens do diretório, se aplicável.
-
-        :return: Lista de subitens ou vazia se não for um diretório.
-        """
-        if self.caminho_atual.is_dir():
-            try:
-                return [str(item) for item in self.caminho_atual.iterdir()]
-            except PermissionError:
-                return ["Erro: Permissões insuficientes"]
-        return []
-
-    def _dados_caminho(self) -> Dict[str, Any]:
-        """
-        Coleta informações detalhadas do caminho.
-
-        :return: Dicionário com informações do caminho.
-        """
-        if not self.caminho_atual.exists():
-            return {
-                "erro": f"O caminho ({str(self.caminho_atual)}) especificado não existe"
-            }
-
-        tipo = "arquivo" if self.caminho_atual.is_file() else "diretório"
         return {
-            "tipo": tipo,
-            "diretorio_pai": str(self.caminho_atual.parent),
-            "nome": self.caminho_atual.name,
-            "caminho_absoluto": str(self.caminho_atual),
-            "estatisticas": self._estatisticas(),
+            "natureza": "ARQUIVO",
+            "infos": {
+                "estrutura": self._estrutura,
+                "estatisticas": self._estatisticas,
+            },
         }
 
-    def obter_informacoes(self) -> str:
+
+class Pasta:
+    """
+    Representa uma pasta no sistema de arquivos, fornecendo informações
+    estruturais, estatísticas e uma lista dos subitens contidos nela.
+
+    Atributos:
+        _caminho (Path): Caminho completo para a pasta.
+        _estrutura (dict): Informações sobre a estrutura da pasta, incluindo:
+            - "nome_pasta": Nome da pasta.
+            - "pastaMae": Caminho do diretório pai da pasta.
+        _estatisticas (dict): Estatísticas da pasta, como tamanho, data de criação
+                              e última modificação.
+        _subitens (list): Lista dos nomes dos arquivos e pastas contidos na pasta.
+    """
+
+    def __init__(self, caminho: Path, estatisticas: dict):
         """
-        Retorna informações detalhadas do caminho em formato JSON.
+        Inicializa um objeto `Pasta` com o caminho e as estatísticas fornecidos.
 
-        :return: Informações em formato JSON.
+        Args:
+            caminho (Path): O caminho completo para a pasta.
+            estatisticas (dict): Dicionário contendo informações estatísticas da pasta,
+                                 como tamanho, data de criação e última modificação.
         """
-        infos = self._dados_caminho()
-        if self.caminho_atual.is_dir():
-            infos["subitens"] = self._subitens()
-        return json.dumps(infos, indent=4, ensure_ascii=False)
+        self._caminho = caminho
+        self._estrutura = {
+            "nome_pasta": self._caminho.name,
+            "pastaMae": str(self._caminho.parent),
+        }
+        self._estatisticas = estatisticas
+        self._subitens = [item.name for item in self._caminho.iterdir()]
+
+    def to_dict(self) -> dict:
+        """
+        Converte as informações do objeto `Pasta` para um dicionário.
+
+        Returns:
+            dict: Um dicionário contendo:
+                - "natureza": Tipo do objeto ("PASTA").
+                - "infos": Sub-dicionário com:
+                    - "estrutura": Informações estruturais da pasta (nome, pasta mãe).
+                    - "estatisticas": Informações estatísticas da pasta (tamanho,
+                                      data de criação, última modificação).
+                    - "subitens": Lista dos nomes dos itens contidos na pasta.
+        """
+        return {
+            "natureza": "PASTA",
+            "infos": {
+                "estrutura": self._estrutura,
+                "estatisticas": self._estatisticas,
+                "subitens": self._subitens,
+            },
+        }
 
 
-# Exemplo de uso
-if __name__ == "__main__":
-    try:
-        caminho = CaminhoBase(
-            caminho_entrada=[
-                "/home/pedro-pm-dias/Downloads/Chrome/",
-                "/home/pedro-pm-dias/Downloads/Chrome/favoritos_17_09_2024.html",
-                "/home/pedro-pm-dias/Downloads/Chrome/Teste",
-                "/caminho/para/teste"
-            ]
+class PathFinder:
+    """
+    Classe para analisar e obter informações sobre caminhos no sistema de arquivos.
+
+    Essa classe processa arquivos e pastas, fornecendo informações detalhadas como
+    estrutura, estatísticas e subitens, além de permitir a análise de caminhos com
+    suporte a regex para caminhos relativos.
+    """
+
+    def __init__(self, entrada_dados: Union[str, List[str]]):
+        """
+        Inicializa a classe com os caminhos de entrada fornecidos.
+
+        Args:
+            entrada_dados (Union[str, List[str]]): Caminhos a serem analisados. Pode ser uma string
+                                                  (caminho único) ou uma lista de strings.
+        """
+        self._caminhos_entrada = (
+            [entrada_dados] if isinstance(entrada_dados, str) else entrada_dados
         )
-        print("ok:", caminho.obter_informacoes())
-    except ValueError as e:
-        print(f"Erro: {e}")
+
+    def formatar_tamanho(self, tamanho_bytes: int) -> dict:
+        """
+        Formata o tamanho de um arquivo ou pasta em kilobytes.
+
+        Args:
+            tamanho_bytes (int): Tamanho em bytes.
+
+        Returns:
+            dict: Dicionário contendo o tamanho em kilobytes.
+        """
+        return {"tamanho_em_kB": round(tamanho_bytes / 1024, 2)}
+
+    def formatar_data_brasileiro(self, timestamp: float) -> str:
+        """
+        Converte um timestamp para o formato de data e hora brasileiro.
+
+        Args:
+            timestamp (float): Timestamp em segundos desde a época Unix.
+
+        Returns:
+            str: Data e hora no formato "dd/mm/aaaa hh:mm:ss".
+        """
+        return datetime.fromtimestamp(timestamp).strftime("%d/%m/%Y %H:%M:%S")
+
+    def analisar_caminhos(self) -> str:
+        """
+        Analisa os caminhos fornecidos e retorna suas informações em formato JSON.
+
+        Returns:
+            str: JSON contendo os resultados da análise dos caminhos.
+        """
+        resultado_analise = [
+            {"caminhoEntrada": caminho, "statusAnalise": self._analisar_status(caminho)}
+            for caminho in self._caminhos_entrada
+        ]
+        return json.dumps(resultado_analise, indent=4, ensure_ascii=False)
+
+    def analisar_caminhos_com_regex(self) -> str:
+        """
+        Analisa caminhos que possivelmente começam com '../', corrigindo automaticamente
+        até encontrar um caminho válido ou atingir o limite de tentativas.
+
+        Returns:
+            str: JSON contendo os resultados da análise dos caminhos corrigidos.
+        """
+        regex = re.compile(r"^\.\./")
+        resultado_analise = []
+
+        for caminho in self._caminhos_entrada:
+            caminho_obj = Path(caminho)
+            tentativas = 0
+            while regex.match(caminho) and tentativas < 10:
+                if not caminho_obj.exists():
+                    tentativas += 1
+                    caminho = "../" + caminho
+                    caminho_obj = Path(caminho)
+                else:
+                    break
+            resultado_analise.append(
+                {
+                    "caminhoEntrada": caminho,
+                    "statusAnalise": self._analisar_status(caminho),
+                }
+            )
+
+        return json.dumps(resultado_analise, indent=4, ensure_ascii=False)
+
+    def _analisar_status(self, caminho: str) -> dict:
+        """
+        Analisa o status de um caminho, determinando se é um arquivo, pasta ou inválido.
+
+        Args:
+            caminho (str): Caminho a ser analisado.
+
+        Returns:
+            dict: Dicionário contendo informações detalhadas sobre o status do caminho.
+        """
+        caminho_obj = Path(caminho)
+        if not caminho_obj.exists():
+            return {"tipo": "erro", "mensagem": "Caminho não encontrado"}
+
+        estatisticas = self._obter_estatisticas(caminho_obj)
+        if caminho_obj.is_file():
+            return Arquivo(caminho_obj, estatisticas).to_dict()
+        elif caminho_obj.is_dir():
+            return Pasta(caminho_obj, estatisticas).to_dict()
+
+        return {"tipo": "erro", "mensagem": "Status desconhecido"}
+
+    def _obter_estatisticas(self, caminho_obj: Path) -> dict:
+        """
+        Obtém as estatísticas de um arquivo ou pasta, como tamanho, data de criação
+        e última modificação.
+
+        Args:
+            caminho_obj (Path): Objeto `Path` representando o caminho a ser analisado.
+
+        Returns:
+            dict: Dicionário contendo as estatísticas formatadas do caminho.
+        """
+        estatisticas = caminho_obj.stat()
+        return {
+            "tamanho": self.formatar_tamanho(estatisticas.st_size),
+            "dataCriacao": self.formatar_data_brasileiro(estatisticas.st_ctime),
+            "ultimaModificacao": self.formatar_data_brasileiro(estatisticas.st_mtime),
+        }
