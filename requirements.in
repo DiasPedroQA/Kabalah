@@ -1,0 +1,19 @@
+# requirements.in
+
+autopep8
+black
+flake8
+mypy
+Flask
+pylint
+isort
+pycodestyle
+pydocstyle
+pytest
+pytest-cov
+pytest-mock
+pytest-flake8
+pytest-html
+pytest-pylint
+pytest-venv
+pytest-black

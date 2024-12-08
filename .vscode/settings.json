@@ -16,17 +16,16 @@
 
   // Excluir arquivos de cache e temporários da visualização de arquivos no VS Code
   "files.exclude": {
-    "**/trash": true,
     "build": true,
     "config": true,
     "docs": true,
     "htmlcov": true,
     "**/__pycache__": true,
     "**/__init__.py": true,
-    ".mypy_cache": true,
     "**/.pytest_cache": true,
     "**/.venv": true,
-    "**/*.egg-info": true
+    "**/*.egg-info": true,
+    ".mypy_cache": true,
   },
 
   // Adiciona o diretório "config" aos caminhos de análise do Python
@@ -44,6 +43,7 @@
   // Configuração de palavras técnicas para evitar erros ortográficos
   "cSpell.words": [
     "addopts",
+    "apresentacao",
     "argparse",
     "asyncio",
     "capsys",
@@ -55,8 +55,10 @@
     "diretorios",
     "docparams",
     "docstrings",
+    "elif",
     "espacos",
     "estatisticas",
+    "execucao",
     "existencia",
     "extensao",
     "extensoes",
@@ -68,6 +70,7 @@
     "isort",
     "jsonc",
     "Kabalah",
+    "kernelspec",
     "levelname",
     "maxfail",
     "modificacao",
@@ -75,23 +78,34 @@
     "multiplas",
     "multiplos",
     "mypy",
+    "nbconvert",
+    "nbformat",
+    "padrao",
+    "PADROES",
+    "pathlib",
     "pep8",
     "permissao",
     "permissoes",
     "pycache",
     "pydantic",
+    "pygments",
     "pylint",
     "pylintrc",
     "pytest",
     "pythonpath",
     "rcfile",
     "relatorio",
+    "rglob",
     "rwxr",
+    "saida",
+    "staticmethod",
     "subdiretorio",
     "testpaths",
     "unico",
     "utf",
     "varios",
+    "venv",
+    "verificacao",
     "vscode",
     "xdist"
   ],
@@ -113,5 +127,6 @@
   "python.analysis.typeCheckingMode": "standard",
   "cSpell.enabledFileTypes": {
     "python": true
-  }
+  },
+  "wolf.disableHotModeWarning": true
 }

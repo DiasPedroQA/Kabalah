@@ -11,7 +11,7 @@ A estrutura deste pacote permite uma organização clara e uma fácil manutenç�
 
 # O pacote `src` inicializa e expõe os módulos principais.
 from .controllers import ControladorDeCaminhos
-from .models import CaminhoBase
-from .views import exibir_resultados
+from ..src.models import CaminhoBase
+from ..src.views import exibir_resultados
 
 __all__ = ["ControladorDeCaminhos", "CaminhoBase", "exibir_resultados"]

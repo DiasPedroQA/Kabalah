@@ -1,0 +1,62 @@
+# .black
+[tool.black]
+line-length = 88  # Define o limite de comprimento das linhas, que é 88 caracteres, o mesmo recomendado pelo Flake8
+skip-string-normalization = true  # Evita a alteração de aspas simples para aspas duplas, mantendo o estilo original do código
+
+# Configuração para o isort (organização das importações)
+[tool.isort]
+profile = "black"  # Usa o perfil de formatação do Black para organizar as importações, garantindo consistência no estilo
+
+# Configurações para o mypy (verificação de tipos estáticos)
+[tool.mypy]
+disallow_untyped_defs = true  # Impede a definição de funções sem anotação de tipo
+disallow_incomplete_defs = true  # Exige que todas as funções tenham suas anotações de tipo completas
+warn_unused_ignores = true  # Emite um aviso se houver diretivas 'ignore' não utilizadas no código
+strict_optional = true  # Exige que todos os valores opcionais sejam explicitamente tratados (ex: Optional[X])
+disallow_untyped_calls = true  # Impede chamadas para funções sem anotações de tipo
+disallow_untyped_decorators = true  # Impede o uso de decoradores sem anotações de tipo
+disallow_subclassing_any = true  # Impede a criação de subclasses de tipos Any
+disallow_incomplete_base_classes = true  # Impede a criação de classes base incompletas (sem anotações de tipo)
+disallow_untyped = true  # Impede o uso de variáveis sem anotações de tipo
+
+# Configurações do pytest (framework de testes)
+[tool.pytest.ini_options]
+pythonpath = ["src"]  # Define o caminho para o código-fonte, útil para importações
+testpaths = ["tests"]  # Define o diretório onde os testes estão localizados
+
+# Configurações do Coverage (relatório de cobertura de testes)
+[tool.coverage.report]
+exclude_lines = [
+    # Exclui linhas específicas do relatório de cobertura de testes, geralmente por serem irrelevantes para o teste
+    "pragma: no cover",  # Exclui linhas com a diretiva "no cover" (para ignorar linhas no relatório)
+    "raise NotImplementedError",  # Exclui linhas que levantam exceções como NotImplementedError
+    "raise AssertionError",  # Exclui AssertionError que são comuns em testes falhos
+    "raise Exception",  # Exclui linhas com exceções genéricas, frequentemente usadas em protótipos ou exemplos
+    "raise ValueError",  # Exclui linhas com erros de valor esperados em verificações
+    "raise TypeError",  # Exclui erros de tipo, comuns em código que valida entradas
+    "raise RuntimeError",  # Exclui erros em tempo de execução (geralmente em testes de exceções)
+    "raise SyntaxError",  # Exclui erros de sintaxe, já tratados antes de rodar os testes
+    "raise ImportError",  # Exclui erros de importação, muitas vezes temporários
+    "raise IndexError",  # Exclui erros de índice, usados em operações com listas ou arrays
+    "raise KeyError",  # Exclui erros de chave em dicionários
+    "raise AttributeError",  # Exclui erros de atributos, normalmente em testes de acessos inválidos
+    "raise NameError",  # Exclui erros de nomes, relacionados à ausência de variáveis
+    "raise TypeError",  # Exclui erros de tipo (geralmente em testes de entradas)
+    "raise ValueError",  # Exclui erros de valor, típicos em validações
+    "raise EOFError",  # Exclui erros de fim de arquivo
+    "raise SystemExit",  # Exclui o erro de saída do sistema, usado para finalizar programas
+    "raise KeyboardInterrupt",  # Exclui interrupções do teclado
+    "raise StopIteration",  # Exclui erros relacionados a iteração (geralmente em loops)
+    "raise StopAsyncIteration",  # Exclui iteração assíncrona
+    "raise GeneratorExit",  # Exclui erros ao terminar geradores
+    "raise MemoryError",  # Exclui erros de memória
+    "raise OverflowError",  # Exclui erros de estouro
+    "raise RecursionError",  # Exclui erros de recursão (profundidade de chamadas recursivas)
+    "raise RuntimeWarning",  # Exclui avisos em tempo de execução
+    "raise PendingDeprecationWarning",  # Exclui avisos de descontinuação futura
+    "raise ImportWarning",  # Exclui avisos de importação
+    "raise UnicodeWarning",  # Exclui avisos sobre Unicode
+    "raise BytesWarning",  # Exclui avisos sobre bytes
+    "raise ResourceWarning",  # Exclui avisos sobre recursos
+    "raise DeprecationWarning",  # Exclui avisos de descontinuação
+]
